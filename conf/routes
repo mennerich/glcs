@@ -1,0 +1,14 @@
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET     /projects                 			controllers.Application.listProjects
+PUT     /projects/:name                    	controllers.Application.createProject(name: String)
+GET     /projects/list    					controllers.Application.listProjects
+GET     /projects/:id  						controllers.Application.projects(id: Long)
+PUT     /projects/:id/:name           		controllers.Application.addTaskToProject(name: String, id: Long)
+PATCH   /tasks/:id               			controllers.Application.modifyTask(id: Long, color:Option[String] ?= None)
+
+### New Stuff
+GET		/									controllers.Instrument.listEntries
+PUT		/entries/:reading/:nutrition/:readingTime		controllers.Instrument.createEntry(reading: Int, nutrition: String, readingTime: Int)
+GET		/entries/:id						controllers.Instrument.show(id: Long)
+DELETE  /entries/:id						controllers.Instrument.delete(id: Long)
+DELETE  /projects/:name                     controllers.Application.delete(name: String)

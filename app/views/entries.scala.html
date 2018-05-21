@@ -1,0 +1,22 @@
+@(entries: List[Entry])
+
+@main("Entries") {
+  <h4>Entries: @entries.size</h4>
+  <table class="table">
+    <tr>
+  	  <th>id</th>
+  	  <th>reading</th>
+  	  <th>nutrition</th>
+  	  <th>reading time</th>
+    </tr>
+ 
+	@entries.map{entry =>
+	  <tr>
+		<td>@entry.id</td>
+		<td>@entry.reading</td>
+		<td>@entry.nutrition</td>
+		<td>@entry.readingTime</td>
+	  </tr>
+	}
+	</table>
+}
