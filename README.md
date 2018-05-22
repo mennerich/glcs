@@ -1,3 +1,5 @@
+https://travis-ci.com/mennerich/instrument.svg?branch=master
+
 Play 2.6 and Slick 3.2
 ==================
 
