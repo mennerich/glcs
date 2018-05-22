@@ -1,0 +1,20 @@
+language: scala
+scala:
+- 2.12.2
+- 2.11.11
+jdk: oraclejdk8
+sudo: false
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION validateCode
+  - sbt ++$TRAVIS_SCALA_VERSION coverage test docs/test samples/test coverageReport
+  - sbt ++$TRAVIS_SCALA_VERSION docs/validateDocs
+  - sbt ++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt
+before_cache:
+  # Ensure changes to the cache aren't persisted
+  - rm -rf $HOME/.ivy2/cache/com.typesafe.play/play-slick*
+  # Delete all ivydata files since ivy touches them on each build
+  - find $HOME/.ivy2/cache -name "ivydata-*.properties" | xargs rm
