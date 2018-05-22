@@ -8,6 +8,7 @@ CREATE TABLE ENTRY (
     NUTRITION integer NOT NULL,
     READING integer NOT NULL,
     READING_TIME integer NOT NULL,
+    READING_DATE date Not NULL
 );
 
 

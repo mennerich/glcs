@@ -1,5 +1,9 @@
 package models
 
+
+import java.sql.Date
+import java.util.Calendar
+
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
@@ -16,18 +20,19 @@ import scala.concurrent.duration.Duration
 class EntryModelTestSpec extends PlaySpec with GuiceOneAppPerTest  with BeforeAndAfterEach {
 
   val entryRepo = Injector.inject[EntryRepo]
+  val now = new java.sql.Date(Calendar.getInstance().getTime().getTime())
 
   override def afterEach() = EvolutionHelper.clean()
 
   "An item " should {
 
     "be inserted during the first test case" in  {
-        val action = entryRepo.create(131, 1, 1)
+        val action = entryRepo.create(131, 1, 1, now)
           .flatMap(_ => entryRepo.all)
 
         val result = Await.result(action, Duration.Inf)
 
-        result mustBe List(Entry(1, 131, 1, 1))
+        result mustBe List(Entry(1, 131, 1, 1, now))
     }
 
     "and not exist in the second test case" in  {
@@ -39,7 +44,7 @@ class EntryModelTestSpec extends PlaySpec with GuiceOneAppPerTest  with BeforeAn
     }
 
     "and should be added and deleted in the third test case" in {
-        val action = entryRepo.create(131, 1, 1)
+        val action = entryRepo.create(131, 1, 1, now)
           .flatMap(_ => entryRepo.all)
 
         Await.result(action, Duration.Inf)

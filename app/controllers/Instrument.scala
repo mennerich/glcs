@@ -1,7 +1,9 @@
 package controllers
 
+import java.sql.Date
+import java.util.Calendar
 import javax.inject.Inject
-import models.{EntryRepo, Entry, EntryData }
+import models.{EntryRepo, Entry}
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
@@ -9,6 +11,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc._
 import scala.concurrent.{ ExecutionContext, Future }
 
+case class EntryData(reading: Int, nutrition: Int, readingTime: Int, readingDate: String)
 
 class Instrument @Inject()
   (implicit ec: ExecutionContext, 
@@ -20,8 +23,14 @@ class Instrument @Inject()
     mapping(
       "reading" -> number,
       "nutrition" -> number,
-      "readingTime" -> number)
+      "readingTime" -> number,
+      "readingDate" -> nonEmptyText)
     (EntryData.apply)(EntryData.unapply)
+  )
+
+  case class DateTest(date: String)
+  val dateForm = Form(
+    mapping( "date" -> nonEmptyText)(DateTest.apply)(DateTest.unapply)
   )
   
   def create() = Action {  implicit request =>
@@ -29,10 +38,16 @@ class Instrument @Inject()
   }
 
   def submit() = Action.async { implicit request => 
+    val now = new java.sql.Date(Calendar.getInstance().getTime().getTime())
+
     entryForm.bindFromRequest.fold(
-      formWithErrors => { Future(Ok("fuck")) },
+      formWithErrors => { 
+        println(formWithErrors)
+        Future(Ok("wrong")) 
+      },
       entry => { 
-        entryRepo.create(entry.reading, entry.nutrition, entry.readingTime)
+        val t = entry.readingDate.split(" ")(0).split("/")
+        entryRepo.create(entry.reading, entry.nutrition, entry.readingTime, Date.valueOf(t(2) + "-" + t(0) + "-" + t(1)))
           .map(id => Redirect(routes.Instrument.listEntries) )
       }
     )
@@ -47,7 +62,6 @@ class Instrument @Inject()
     entryRepo.delete(id)
     Future(Redirect(routes.Instrument.listEntries))
   }
-
 
   def show(id: Long) = Action.async { implicit rs =>
     for {

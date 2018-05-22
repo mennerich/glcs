@@ -4,16 +4,27 @@
   <h4>Entries: @entries.size</h4>
   <table class="table table-bordered">
     <tr>
-  	  <th width="5%">id</th>
+
+  	  <th>date</th>
+  	  <th>reading time</th>
   	  <th>reading</th>
   	  <th>nutrition</th>
-  	  <th>reading time</th>
+  	  
   	  <th/>
     </tr>
  
 	@entries.map{entry =>
 	  <tr>
-		<td>@entry.id</td>
+		
+		<td>@entry.readingDate</td>
+				<td>
+		@entry.readingTime match {
+			case 1 => { morning }
+			case 2 => { afternoon }
+			case 3 => { evening }
+			case _ => { NA }
+	    }
+		</td>
 		<td>@entry.reading</td>
 		<td>
 		@entry.nutrition match {
@@ -23,16 +34,9 @@
 			case _ => { NA }
 		}
 		</td>
+
 		<td>
-		@entry.readingTime match {
-			case 1 => { morning }
-			case 2 => { afternoon }
-			case 3 => { evening }
-			case _ => { NA }
-	    }
-		</td>
-		<td>
-		  <a href="/@entry.id/delete" method="GET" class="btn btn-link">
+		  <a href="/entries/@entry.id/delete" method="GET" class="btn btn-link">
 		    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
 			delete
 		  </a>

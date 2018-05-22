@@ -5,6 +5,5 @@ GET     /assets/*file               		controllers.Assets.versioned(path="/public
 GET		/									controllers.Instrument.listEntries
 GET		/create								controllers.Instrument.create
 POST	/submit								controllers.Instrument.submit
-GET		/:id								controllers.Instrument.show(id: Long)
-GET  	/:id/delete							controllers.Instrument.delete(id: Long)
-
+GET		/entries/:id/show					controllers.Instrument.show(id: Long)
+GET  	/entries/:id/delete					controllers.Instrument.delete(id: Long)

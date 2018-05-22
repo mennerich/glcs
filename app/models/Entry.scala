@@ -7,9 +7,10 @@ import slick.dbio.Effect.Read
 import slick.jdbc.JdbcProfile
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import java.sql.Date
 
-case class Entry (id: Long, reading: Int, nutrition: Int, readingTime: Int)
-case class EntryData(reading: Int, nutrition: Int, readingTime: Int)
+case class Entry (id: Long, reading: Int, nutrition: Int, readingTime: Int, readingDate: Date)
+
 
 class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) {
   
@@ -24,8 +25,8 @@ class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 
   def findById(id: Long): Future[Option[Entry]] = db.run(_findById(id))
 
-  def create(reading: Int, nutrition: Int, readingTime: Int): Future[Long] = {
-    val entry = Entry(0, reading, nutrition, readingTime)
+  def create(reading: Int, nutrition: Int, readingTime: Int, readingDate: Date): Future[Long] = {
+    val entry = Entry(0, reading, nutrition, readingTime, readingDate)
     db.run(Entries returning Entries.map(_.id) += entry)
   }
 
@@ -37,9 +38,10 @@ class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
     def reading = column[Int]("READING")
     def nutrition = column[Int]("NUTRITION")
     def readingTime = column[Int]("READING_TIME")
-    def * = (id, reading, nutrition, readingTime) <> (Entry.tupled, Entry.unapply)
-    def ? = (id.?, reading.?, nutrition.?, readingTime.?).shaped.<>( { 
-      r => import r._; _1.map(_ => Entry.tupled((_1.get, _2.get, _3.get, _4.get))) 
+    def readingDate = column[Date]("READING_DATE")
+    def * = (id, reading, nutrition, readingTime, readingDate) <> (Entry.tupled, Entry.unapply)
+    def ? = (id.?, reading.?, nutrition.?, readingTime.?, readingDate.?).shaped.<>( { 
+      r => import r._; _1.map(_ => Entry.tupled((_1.get, _2.get, _3.get, _4.get, _5.get))) 
     }, 
     (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
