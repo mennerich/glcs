@@ -1,0 +1,25 @@
+@(entryForm: Form[EntryData])(implicit request: RequestHeader, messagesProvider: MessagesProvider)
+
+@main("create an entry") {
+  @helper.form(action = routes.Instrument.submit()) {
+    @helper.inputText(entryForm("reading"))
+	
+	@helper.select(
+  	  field = entryForm("nutrition"),
+  	  options = Seq(
+        "1" -> "poor",
+    	"2" -> "adequate",
+    	"3" -> "good")
+    )
+
+    @helper.select(
+  	  field = entryForm("readingTime"),
+  	  options = Seq(
+        "1" -> "morning",
+    	"2" -> "afternoon",
+    	"3" -> "night")
+    )
+
+    <input type="submit" class="btn btn-link" />
+  }
+}

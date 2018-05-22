@@ -8,7 +8,8 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-case class Entry (id: Long, reading: Int, nutrition: String, readingTime: Int)
+case class Entry (id: Long, reading: Int, nutrition: Int, readingTime: Int)
+case class EntryData(reading: Int, nutrition: Int, readingTime: Int)
 
 class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) {
   
@@ -23,7 +24,7 @@ class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 
   def findById(id: Long): Future[Option[Entry]] = db.run(_findById(id))
 
-  def create(reading: Int, nutrition: String, readingTime: Int): Future[Long] = {
+  def create(reading: Int, nutrition: Int, readingTime: Int): Future[Long] = {
     val entry = Entry(0, reading, nutrition, readingTime)
     db.run(Entries returning Entries.map(_.id) += entry)
   }
@@ -34,7 +35,7 @@ class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 
     def id = column[Long]("ID", O.AutoInc, O.PrimaryKey)
     def reading = column[Int]("READING")
-    def nutrition = column[String]("NUTRITION")
+    def nutrition = column[Int]("NUTRITION")
     def readingTime = column[Int]("READING_TIME")
     def * = (id, reading, nutrition, readingTime) <> (Entry.tupled, Entry.unapply)
     def ? = (id.?, reading.?, nutrition.?, readingTime.?).shaped.<>( { 
