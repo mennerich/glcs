@@ -3,3 +3,8 @@
     height: 220px;
     font-size: x-small; 
 }
+
+.move-left {
+    width: auto;
+    box-shadow: none;
+}

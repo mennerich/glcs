@@ -2,13 +2,14 @@
 
 @main("Entries") {
   <h4>Entries: @entries.size</h4>
-  <table class="table table-bordered">
+  <table class="table">
     <tr>
 
   	  <th>date</th>
   	  <th>reading time</th>
   	  <th>reading</th>
   	  <th>nutrition</th>
+  	  <th>exercise</th>
   	  
   	  <th/>
     </tr>
@@ -25,13 +26,22 @@
 			case _ => { NA }
 	    }
 		</td>
+		
 		<td>@entry.reading</td>
+		
 		<td>
 		@entry.nutrition match {
 			case 1 => { poor }
 			case 2 => { adequate }
 			case 3 => { good }
 			case _ => { NA }
+		}
+		</td>
+
+		<td>
+		@entry.exercise match {
+			case false => { no }
+			case true => { yes }
 		}
 		</td>
 

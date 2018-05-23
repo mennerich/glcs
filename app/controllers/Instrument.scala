@@ -11,7 +11,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc._
 import scala.concurrent.{ ExecutionContext, Future }
 
-case class EntryData(reading: Int, nutrition: Int, readingTime: Int, readingDate: String)
+case class EntryData(reading: Int, nutrition: Int, readingTime: Int, readingDate: String, exercise: Boolean)
 
 class Instrument @Inject()
   (implicit ec: ExecutionContext, 
@@ -24,7 +24,8 @@ class Instrument @Inject()
       "reading" -> number,
       "nutrition" -> number,
       "readingTime" -> number,
-      "readingDate" -> nonEmptyText)
+      "readingDate" -> nonEmptyText,
+      "exercise" -> boolean)
     (EntryData.apply)(EntryData.unapply)
   )
 
@@ -47,8 +48,15 @@ class Instrument @Inject()
       },
       entry => { 
         val t = entry.readingDate.split(" ")(0).split("/")
-        entryRepo.create(entry.reading, entry.nutrition, entry.readingTime, Date.valueOf(t(2) + "-" + t(0) + "-" + t(1)))
-          .map(id => Redirect(routes.Instrument.listEntries) )
+        println(entry.exercise)
+        entryRepo.create(
+          entry.reading, 
+          entry.nutrition, 
+          entry.readingTime, 
+          Date.valueOf(t(2) + "-" + t(0) + "-" + t(1)),
+          entry.exercise
+        )
+        .map(id => Redirect(routes.Instrument.listEntries))
       }
     )
   }
@@ -65,7 +73,7 @@ class Instrument @Inject()
 
   def show(id: Long) = Action.async { implicit rs =>
     for {
-      Some(entry) <-  entryRepo.findById(id)
+      Some(entry) <- entryRepo.findById(id)
     } yield Ok(views.html.entry(entry))
   }
 }

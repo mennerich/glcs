@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import java.sql.Date
 
-case class Entry (id: Long, reading: Int, nutrition: Int, readingTime: Int, readingDate: Date)
+case class Entry (id: Long, reading: Int, nutrition: Int, readingTime: Int, readingDate: Date, exercise: Boolean)
 
 
 class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) {
@@ -25,8 +25,8 @@ class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 
   def findById(id: Long): Future[Option[Entry]] = db.run(_findById(id))
 
-  def create(reading: Int, nutrition: Int, readingTime: Int, readingDate: Date): Future[Long] = {
-    val entry = Entry(0, reading, nutrition, readingTime, readingDate)
+  def create(reading: Int, nutrition: Int, readingTime: Int, readingDate: Date, exercise: Boolean): Future[Long] = {
+    val entry = Entry(0, reading, nutrition, readingTime, readingDate, exercise)
     db.run(Entries returning Entries.map(_.id) += entry)
   }
 
@@ -39,12 +39,13 @@ class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
     def nutrition = column[Int]("NUTRITION")
     def readingTime = column[Int]("READING_TIME")
     def readingDate = column[Date]("READING_DATE")
-    def * = (id, reading, nutrition, readingTime, readingDate) <> (Entry.tupled, Entry.unapply)
-    def ? = (id.?, reading.?, nutrition.?, readingTime.?, readingDate.?).shaped.<>( { 
-      r => import r._; _1.map(_ => Entry.tupled((_1.get, _2.get, _3.get, _4.get, _5.get))) 
+    def exercise = column[Boolean]("EXERCISE")
+    def * = (id, reading, nutrition, readingTime, readingDate, exercise) <> (Entry.tupled, Entry.unapply)
+    def ? = (id.?, reading.?, nutrition.?, readingTime.?, readingDate.?, exercise.?)
+      .shaped.<>( { r => import 
+        r._; _1.map(_ => Entry.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get))) 
     }, 
     (_: Any) => throw new Exception("Inserting into ? projection not supported."))
-
   }
 
 }
