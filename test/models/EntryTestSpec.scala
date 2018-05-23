@@ -20,7 +20,7 @@ import scala.concurrent.duration.Duration
 class EntryModelTestSpec extends PlaySpec with GuiceOneAppPerTest  with BeforeAndAfterEach {
 
   val entryRepo = Injector.inject[EntryRepo]
-  val now = new java.sql.Date(Calendar.getInstance().getTime().getTime())
+  val now = Date.valueOf("1977-01-26")
 
   override def afterEach() = EvolutionHelper.clean()
 
@@ -43,7 +43,7 @@ class EntryModelTestSpec extends PlaySpec with GuiceOneAppPerTest  with BeforeAn
         result mustBe List.empty
     }
 
-    "and should be added and deleted in the third test case" in {
+    "and be added and deleted in the third test case" in {
         val action = entryRepo.create(131, 1, 1, now)
           .flatMap(_ => entryRepo.all)
 

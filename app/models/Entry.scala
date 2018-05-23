@@ -19,7 +19,7 @@ class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
   import dbConfig.profile.api._  
   private[models] val Entries = TableQuery[EntriesTable]
 
-  def all: Future[List[Entry]] = db.run(Entries.to[List].result)
+  def all: Future[List[Entry]] = db.run(Entries.sortBy(_.readingDate.desc).to[List].result)
 
   private def _findById(id: Long): DBIO[Option[Entry]] = Entries.filter(_.id === id).result.headOption
 

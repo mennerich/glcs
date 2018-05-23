@@ -1,38 +1,37 @@
 @(entryForm: Form[EntryData])(implicit request: RequestHeader, messagesProvider: MessagesProvider)
 
 @main("create an entry") {
+  
+  
   @helper.form(action = routes.Instrument.submit()) {
-    @helper.inputText(entryForm("reading"))
-	
-	@helper.select(
-  	  field = entryForm("nutrition"),
-  	  options = Seq(
-        "1" -> "poor",
-    	"2" -> "adequate",
-    	"3" -> "good")
-    )
+    <div class="form">
+      
+      @helper.inputText(entryForm("reading"), 'class -> "form-control")
+  	
+      @helper.select(
+    	  field = entryForm("nutrition"),
+    	  options = Seq(
+          "1" -> "poor",
+          "2" -> "adequate",
+          "3" -> "good"), 
+        'class -> "form-control"
+      )
 
-    @helper.select(
-  	  field = entryForm("readingTime"),
-  	  options = Seq(
-        "1" -> "morning",
-    	"2" -> "afternoon",
-    	"3" -> "night")
-    )
+      @helper.select(
+    	  field = entryForm("readingTime"),
+    	  options = Seq(
+          "1" -> "morning",
+      	  "2" -> "afternoon",
+      	  "3" -> "night"), 
+        'class -> "form-control"
+      )
 
-
-    <div class='col-sm-6'> 
-      <div class="form-group">
-        <div class='input-group date' id='datetimepicker1'>
-            <input type='text' name="readingDate" class="form-control" />
-            <span class="input-group-addon">
-                <span class="glyphicon glyphicon-calendar"></span>
-            </span>
-        </div>
-      </div>
+      
+      <input type="text" name="readingDate" id="datepicker" class="form-control">
+      <br />
+      <input type="submit" class="btn btn-default" />
     </div>
-
-    <br />
-    <input type="submit" class="btn btn-link" />
   }
+
+
 }

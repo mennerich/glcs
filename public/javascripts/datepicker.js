@@ -1,2 +1,3 @@
-
-$(function () { $('#datetimepicker1').datetimepicker(); });
+  $( function() {
+    $( "#datepicker" ).datepicker();
+  } );
