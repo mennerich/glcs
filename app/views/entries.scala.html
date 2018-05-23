@@ -1,7 +1,7 @@
 @(entries: List[Entry])
 
 @main("Entries") {
-  <h4>Entries: @entries.size</h4>
+  <p># of entries: @entries.size</p>
   <table class="table">
     <tr>
 
@@ -54,5 +54,5 @@
 	  </tr>
 	}
   </table>
-  <a href="@routes.Instrument.create" class="btn btn-link">Add Entry</a>
+  <a href="@routes.Instrument.create" class="btn btn-default">Add Entry</a>
 }
