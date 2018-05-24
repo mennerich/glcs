@@ -17,6 +17,7 @@ libraryDependencies ++= Seq(
     "com.h2database" % "h2" % "1.4.192",
     "mysql" % "mysql-connector-java" % "5.1.34",
     "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0" % "test",
+    "commons-codec" % "commons-codec" % "1.11",
     specs2 % Test,
     guice,
     evolutions
