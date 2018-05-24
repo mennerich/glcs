@@ -4,6 +4,9 @@ scala:
 - 2.11.11
 jdk: oraclejdk8
 sudo: false
+services:
+  - mysql
+  
 cache:
   directories:
     - $HOME/.ivy2/cache
