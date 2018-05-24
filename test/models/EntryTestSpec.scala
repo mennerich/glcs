@@ -27,12 +27,12 @@ class EntryModelTestSpec extends PlaySpec with GuiceOneAppPerTest  with BeforeAn
   "An item " should {
 
     "be inserted during the first test case" in  {
-        val action = entryRepo.create(131, 1, 1, now)
+        val action = entryRepo.create(131, 1, 1, now, true)
           .flatMap(_ => entryRepo.all)
 
         val result = Await.result(action, Duration.Inf)
 
-        result mustBe List(Entry(1, 131, 1, 1, now))
+        result mustBe List(Entry(1, 131, 1, 1, now, true))
     }
 
     "and not exist in the second test case" in  {
@@ -44,7 +44,7 @@ class EntryModelTestSpec extends PlaySpec with GuiceOneAppPerTest  with BeforeAn
     }
 
     "and be added and deleted in the third test case" in {
-        val action = entryRepo.create(131, 1, 1, now)
+        val action = entryRepo.create(131, 1, 1, now, true)
           .flatMap(_ => entryRepo.all)
 
         Await.result(action, Duration.Inf)
