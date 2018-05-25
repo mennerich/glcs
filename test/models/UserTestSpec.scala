@@ -39,9 +39,10 @@ class UserTestSpec extends PlaySpec with GuiceOneAppPerTest  with BeforeAndAfter
       val create = userRepo.create("email@example.com", "password")
       Await.result(create, Duration.Inf)
 
-      val auth = userRepo.authenticate("email@example.com", "password")
-      
-      auth mustBe true
+      userRepo.authenticate("email@example.com", "password") match {
+        case Some(key) => true
+        case None => false
+      }
     }
   }
 }

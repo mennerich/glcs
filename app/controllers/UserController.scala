@@ -3,7 +3,7 @@ package controllers
 import java.sql.Date
 import java.util.Calendar
 import javax.inject.Inject
-import models.{UserRepo, User}
+import models.{UserRepo, User, SessionKeyRepo}
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
@@ -16,6 +16,7 @@ case class Auth(email: String, password: String)
 class Authentication @Inject()
   (implicit ec: ExecutionContext, 
   userRepo: UserRepo, 
+  sessionKeyRepo: SessionKeyRepo,
   val controllerComponents: ControllerComponents) 
   extends BaseController with I18nSupport {
 
@@ -35,7 +36,13 @@ class Authentication @Inject()
     }
 
     def logout() = Action { implicit request  =>
-      Redirect(routes.Instrument.listEntries).withNewSession
+      request.session.get("glcs-session").map { session =>
+        sessionKeyRepo.delete(session)
+        Redirect(routes.Instrument.listEntries).withNewSession
+      }.getOrElse {
+        Unauthorized("no session")
+      }
+      
     }
 
     def submit() = Action.async { implicit request =>
@@ -44,7 +51,7 @@ class Authentication @Inject()
             Future(Ok("wrong")) 
           },
           user => { userRepo.create(user.email, user.password) 
-        .map(id => Redirect(routes.Instrument.listEntries))
+        .map(id => Redirect(routes.Instrument.listEntries).flashing("success" -> "user created"))
           }
       )
     }
@@ -56,9 +63,13 @@ class Authentication @Inject()
           },
           user => {
             userRepo.authenticate(user.email, user.password) match {
-              case true => Future(Redirect(routes.Instrument.listEntries)
-                .withSession("session-token" -> "true"))
-              case false => Future(Ok("false"))
+              case Some(s) => {
+                Future(Redirect(routes.Instrument.listEntries)
+                  .withSession("glcs-session" -> s)
+                  .flashing("success" -> "successfuly logged in")
+                )
+              }
+              case None => Future(Ok("false"))
             }
           } 
       )

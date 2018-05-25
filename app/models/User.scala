@@ -12,9 +12,10 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.Future
 import scala.util.Random
 
+
 case class User(id: Long, email: String, hash: String, salt: String)
 
-class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) {
+class UserRepo @Inject()(sessionKeyRepo: SessionKeyRepo, protected val dbConfigProvider: DatabaseConfigProvider) {
 
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   val db = dbConfig.db
@@ -39,18 +40,22 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
 
   private def _findByEmail(email: String): DBIO[Option[User]] = Users.filter(_.email === email).result.headOption
 
-  def authenticate(email: String, password: String): Boolean = {
+  def authenticate(email: String, password: String): Option[String] = {
       val action = findByEmail(email)
       val result = Await.result(action, Duration.Inf)
       result match {
         case Some(user) => {
           val hash = DigestUtils.md5Hex(password + user.salt)
           (hash == user.hash) match {
-            case true =>  true
-            case false => false
+            case true =>  {
+              val sessionKey = DigestUtils.md5Hex(Random.alphanumeric.take(10).mkString)
+              sessionKeyRepo.create(user.id, sessionKey)
+              Some(sessionKey)
+            }
+            case false => None
           }
         }
-        case None => false
+        case None => None
       }
   }
 

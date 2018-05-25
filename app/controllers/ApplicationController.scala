@@ -28,11 +28,6 @@ class Instrument @Inject()
       "exercise" -> boolean)
     (EntryData.apply)(EntryData.unapply)
   )
-
-  case class DateTest(date: String)
-  val dateForm = Form(
-    mapping( "date" -> nonEmptyText)(DateTest.apply)(DateTest.unapply)
-  )
   
   def create() = Action {  implicit request =>
     Ok(views.html.create(entryForm))
@@ -43,7 +38,6 @@ class Instrument @Inject()
 
     entryForm.bindFromRequest.fold(
       formWithErrors => { 
-        println(formWithErrors)
         Future(Ok("wrong")) 
       },
       entry => { 
@@ -56,7 +50,7 @@ class Instrument @Inject()
           Date.valueOf(t(2) + "-" + t(0) + "-" + t(1)),
           entry.exercise
         )
-        .map(id => Redirect(routes.Instrument.listEntries))
+        .map(id => Redirect(routes.Instrument.listEntries).flashing("success" -> "glcs entry created"))
       }
     )
   }
@@ -68,7 +62,7 @@ class Instrument @Inject()
 
   def delete(id: Long) = Action.async { implicit rs =>
     entryRepo.delete(id)
-    Future(Redirect(routes.Instrument.listEntries))
+    Future(Redirect(routes.Instrument.listEntries).flashing("success" -> "entry deleted"))
   }
 
   def show(id: Long) = Action.async { implicit rs =>

@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Random
 
-case class SessionKey(id: Long, sessionKey: String, userId: Int)
+case class SessionKey(id: Long, sessionKey: String, userId: Long)
 
 class SessionKeyRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) {
   
@@ -25,20 +25,18 @@ class SessionKeyRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPro
 
   def findById(id: Long): Future[Option[SessionKey]] = db.run(_findById(id))
 
-  def create(userId: Int): Future[Long] = {
-    val seed = Random.alphanumeric.take(10).mkString
-    val sKey = DigestUtils.md5Hex(seed)
-    val sessionKey = SessionKey(0, sKey, userId)
+  def create(userId: Long, key: String): Future[Long] = {
+    val sessionKey = SessionKey(0, key, userId)
     db.run(SessionKeys returning SessionKeys.map(_.id) += sessionKey)
   }
 
-  def delete(id: Long): Future[Unit] = db.run(SessionKeys.filter(_.id === id).delete).map(_ => ())
+  def delete(sessionKey: String): Future[Unit] = db.run(SessionKeys.filter(_.sessionKey === sessionKey).delete).map(_ => ())
 
   private[models] class SessionKeysTable(tag: Tag) extends Table[SessionKey](tag, "SESSION") {
 
     def id = column[Long]("ID", O.AutoInc, O.PrimaryKey)
     def sessionKey = column[String]("SESSION_KEY")
-    def userId = column[Int]("USER_ID")
+    def userId = column[Long]("USER_ID")
     def * = (id, sessionKey, userId) <> (SessionKey.tupled, SessionKey.unapply)
     def ? = (id.?, sessionKey.?, userId.?)
       .shaped.<>( { r => import 
