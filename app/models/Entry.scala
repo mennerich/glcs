@@ -31,6 +31,7 @@ class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
   }
 
   def delete(id: Long): Future[Unit] = db.run(Entries.filter(_.id === id).delete).map(_ => ())
+  
 
   private[models] class EntriesTable(tag: Tag) extends Table[Entry](tag, "ENTRY") {
 

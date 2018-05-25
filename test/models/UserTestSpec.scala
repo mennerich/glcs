@@ -35,7 +35,7 @@ class UserTestSpec extends PlaySpec with GuiceOneAppPerTest  with BeforeAndAfter
   }
 
   "A user " should {
-    "authenticate durin the second test case" in {
+    "authenticate during the second test case" in {
       val create = userRepo.create("email@example.com", "password")
       Await.result(create, Duration.Inf)
 
