@@ -3,7 +3,7 @@ package controllers
 import java.sql.Date
 import java.util.Calendar
 import javax.inject.Inject
-import models.{EntryRepo, Entry}
+import models.{EntryRepo, Entry, SessionKeyRepo }
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
@@ -16,6 +16,7 @@ case class EntryData(reading: Int, nutrition: Int, readingTime: Int, readingDate
 class Instrument @Inject()
   (implicit ec: ExecutionContext, 
   entryRepo: EntryRepo, 
+  sessionKeyRepo: SessionKeyRepo,
   val controllerComponents: ControllerComponents) 
   extends BaseController with I18nSupport {
 
@@ -30,7 +31,14 @@ class Instrument @Inject()
   )
   
   def create() = Action {  implicit request =>
-    Ok(views.html.create(entryForm))
+    request.session.get("glcs-session").map { sessionKey =>
+      sessionKeyRepo.keyExists(sessionKey) match {
+        case true => Ok(views.html.create(entryForm))
+        case false => Redirect(routes.Instrument.listEntries).flashing("error" -> "you must be logged in to create an entry")
+      }
+    }.getOrElse {
+        Redirect(routes.Instrument.listEntries).flashing("error" -> "you must be logged in to create an entry")
+      }
   }
 
   def submit() = Action.async { implicit request => 
@@ -55,19 +63,21 @@ class Instrument @Inject()
     )
   }
 
-  def listEntries = Action.async { implicit rs =>
-  	entryRepo.all
-      .map(entries => Ok(views.html.entries(entries)))
+  def listEntries = Action.async { implicit request =>
+    
+    request.session.get("glcs-session").map { sessionKey =>
+      val sessionValid = sessionKeyRepo.keyExists(sessionKey)
+      entryRepo.all
+       .map(entries => Ok(views.html.entries(entries, sessionValid)))
+    }.getOrElse {
+      entryRepo.all
+       .map(entries => Ok(views.html.entries(entries, false)))
+    }
   }
 
-  def delete(id: Long) = Action.async { implicit rs =>
+  def delete(id: Long) = Action.async { implicit request =>
     entryRepo.delete(id)
     Future(Redirect(routes.Instrument.listEntries).flashing("success" -> "entry deleted"))
   }
-
-  def show(id: Long) = Action.async { implicit rs =>
-    for {
-      Some(entry) <- entryRepo.findById(id)
-    } yield Ok(views.html.entry(entry))
-  }
+  
 }

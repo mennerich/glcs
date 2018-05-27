@@ -1,6 +1,17 @@
-@(entries: List[Entry])
+@(entries: List[Entry], validSession: Boolean)(implicit request: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
-@main("Entries") {
+@main("Entries", validSession) {
+
+  @flash.get("success") match {
+  	case Some(s) => { <div class="alert alert-success" role="alert">@s</div>}
+  	case None => { }
+  }
+  
+  @flash.get("error") match {
+  	case Some(e) => { <div class="alert alert-danger" role="alert"> @e </div> }
+  	case None => { }
+  }
+
   <p># of entries: @entries.size</p>
   <table class="table">
     <tr>
@@ -10,8 +21,10 @@
   	  <th>reading</th>
   	  <th>nutrition</th>
   	  <th>exercise</th>
-  	  
-  	  <th/>
+  	    @validSession match {
+          case true => { <th/> }
+          case false => { }
+        }
     </tr>
  
 	@entries.map{entry =>
@@ -44,15 +57,24 @@
 			case true => { yes }
 		}
 		</td>
+		@validSession match {
+          case true => { 
+			<td>
+			  <a href="/entries/@entry.id/delete" method="GET" class="btn btn-link">
+			    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+				delete
+			  </a>
+		    </td>
+		  } case false => { }
+        }
 
-		<td>
-		  <a href="/entries/@entry.id/delete" method="GET" class="btn btn-link">
-		    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-			delete
-		  </a>
-	    </td>
 	  </tr>
 	}
   </table>
-  <a href="@routes.Instrument.create" class="btn btn-default">Add Entry</a>
+  
+  @validSession match {
+    case true => { <a href="@routes.Instrument.create" class="btn btn-default">Add Entry</a> }
+    case fale => { }
+  }
+
 }

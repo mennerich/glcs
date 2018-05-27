@@ -7,6 +7,8 @@ import slick.dbio
 import slick.dbio.Effect.Read
 import slick.jdbc.JdbcProfile
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 import scala.concurrent.Future
 import scala.util.Random
 
@@ -24,6 +26,17 @@ class SessionKeyRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPro
   private def _findById(id: Long): DBIO[Option[SessionKey]] = SessionKeys.filter(_.id === id).result.headOption
 
   def findById(id: Long): Future[Option[SessionKey]] = db.run(_findById(id))
+
+  private def _findBySessionKey(sessionKey: String): DBIO[Option[SessionKey]] = SessionKeys.filter(_.sessionKey === sessionKey).result.headOption
+  
+  def keyExists(sessionKey: String): Boolean = {
+    val action = db.run(_findBySessionKey(sessionKey))
+    val result = Await.result(action, Duration.Inf)
+    result match {
+      case Some(s) => true
+      case None => false
+    }
+  }
 
   def create(userId: Long, key: String): Future[Long] = {
     val sessionKey = SessionKey(0, key, userId)

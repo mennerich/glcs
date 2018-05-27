@@ -1,6 +1,6 @@
 @(authForm: Form[Auth])(implicit request: RequestHeader, messagesProvider: MessagesProvider)
 
-@main("create an user") {
+@main("create an user", false) {
   
   
   @helper.form(action = routes.Authentication.submit) {
