@@ -38,7 +38,7 @@ class Instrument @Inject()
       }
     }.getOrElse {
         Redirect(routes.Instrument.listEntries).flashing("error" -> "you must be logged in to create an entry")
-      }
+    }
   }
 
   def submit() = Action.async { implicit request => 
@@ -46,7 +46,7 @@ class Instrument @Inject()
 
     entryForm.bindFromRequest.fold(
       formWithErrors => { 
-        Future(Ok("wrong")) 
+        Future(Redirect(routes.Instrument.listEntries).flashing("error" -> "invalid form"))
       },
       entry => { 
         val t = entry.readingDate.split(" ")(0).split("/")

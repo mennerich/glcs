@@ -28,7 +28,14 @@ class Authentication @Inject()
   )
 
     def create() = Action {  implicit request =>
-      Ok(views.html.users.create(authForm))
+      request.session.get("glcs-session").map { sessionKey =>
+        sessionKeyRepo.keyExists(sessionKey) match {
+          case true => Ok(views.html.users.create(authForm))
+          case false => Redirect(routes.Instrument.listEntries).flashing("error" -> "you must be logged in to create an user")
+        }
+      }.getOrElse {
+        Redirect(routes.Instrument.listEntries).flashing("error" -> "you must be logged in to create a user")
+      }
     }
 
     def login() = Action { implicit request => 
@@ -40,7 +47,7 @@ class Authentication @Inject()
         sessionKeyRepo.delete(session)
         Redirect(routes.Instrument.listEntries).withNewSession
       }.getOrElse {
-        Unauthorized("no session")
+        Redirect(routes.Instrument.listEntries).flashing("error" -> "session not available")
       }
       
     }
@@ -59,7 +66,7 @@ class Authentication @Inject()
     def authenticate() = Action.async { implicit request =>
       authForm.bindFromRequest.fold(
           formWithErrors => {
-            Future(Ok("wrong"))
+            Future(Redirect(routes.Instrument.listEntries).flashing("error" -> "invalid form"))
           },
           user => {
             userRepo.authenticate(user.email, user.password) match {
@@ -69,7 +76,7 @@ class Authentication @Inject()
                   .flashing("success" -> "successfuly logged in")
                 )
               }
-              case None => Future(Ok("false"))
+              case None => Future(Redirect(routes.Instrument.listEntries).flashing("error" -> "login failed"))
             }
           } 
       )
