@@ -11,6 +11,7 @@ import java.sql.Date
 
 case class Entry (id: Long, reading: Int, nutrition: Int, readingTime: Int, readingDate: Date, exercise: Boolean)
 
+case class EntryData(reading: Int, nutrition: Int, readingTime: Int, readingDate: String, exercise: Boolean)
 
 class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) {
   

@@ -19,7 +19,8 @@ libraryDependencies ++= Seq(
     "commons-codec" % "commons-codec" % "1.11",
     specs2 % Test,
     guice,
-    evolutions
+    evolutions, 
+    ws
 )
 
 resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
