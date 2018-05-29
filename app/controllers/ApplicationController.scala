@@ -1,15 +1,17 @@
 package controllers
 
+import helpers.{ StatsSupport, Averages }
 import java.sql.Date
 import java.util.Calendar
 import javax.inject.Inject
-import models.{EntryRepo, Entry, SessionKeyRepo }
+import models.{ EntryRepo, Entry, SessionKeyRepo }
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
 import play.api.i18n.I18nSupport
 import play.api.mvc._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ Await, ExecutionContext, Future }
+import scala.concurrent.duration.Duration
 
 case class EntryData(reading: Int, nutrition: Int, readingTime: Int, readingDate: String, exercise: Boolean)
 
@@ -18,7 +20,7 @@ class Instrument @Inject()
   entryRepo: EntryRepo, 
   sessionKeyRepo: SessionKeyRepo,
   val controllerComponents: ControllerComponents) 
-  extends BaseController with I18nSupport {
+  extends BaseController with I18nSupport with StatsSupport {
 
   val entryForm = Form(
     mapping(
@@ -26,7 +28,7 @@ class Instrument @Inject()
       "nutrition" -> number,
       "readingTime" -> number,
       "readingDate" -> nonEmptyText,
-      "exercise" -> boolean)
+      "exercise" -> boolean )
     (EntryData.apply)(EntryData.unapply)
   )
   
@@ -67,11 +69,20 @@ class Instrument @Inject()
     
     request.session.get("glcs-session").map { sessionKey =>
       val sessionValid = sessionKeyRepo.keyExists(sessionKey)
-      entryRepo.all
-       .map(entries => Ok(views.html.entries(entries, sessionValid)))
+      val action = entryRepo.all
+      val entries = Await.result(action, Duration.Inf)
+      val averages: Averages = getAverages(entries)
+      
+      Future(Ok(views.html.entries(entries, sessionValid, averages)))
+
+
     }.getOrElse {
-      entryRepo.all
-       .map(entries => Ok(views.html.entries(entries, false)))
+      entryRepo.all.map(
+        entries => {
+          val averages: Averages = getAverages(entries)
+          Ok(views.html.entries(entries, false, averages))
+        }
+      )
     }
   }
 

@@ -1,76 +1,95 @@
-@(entries: List[Entry], validSession: Boolean)(implicit request: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(entries: List[Entry], validSession: Boolean, averages: helpers.Averages)(implicit request: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
 @main("Entries", validSession) {
 
   @flash.get("success") match {
-  	case Some(s) => { <div class="alert alert-success" role="alert">@s</div>}
-  	case None => { }
+    case Some(s) => { <div class="alert alert-success" role="alert">@s</div>}
+    case None => { }
   }
   
   @flash.get("error") match {
-  	case Some(e) => { <div class="alert alert-danger" role="alert"> @e </div> }
-  	case None => { }
+    case Some(e) => { <div class="alert alert-danger" role="alert"> @e </div> }
+    case None => { }
   }
+    <h4>Average MG/DL</h4>
+    <div class="well">
+    <table class="table">
+      <tr>
+        <th>total</th>
+        <th>morning</th>
+        <th>afternoon</th>
+        <th>evening</th>
+      </tr>
+      <tr>
+        <td>@averages.total</td>
+        <td>@averages.morning</td>
+        <td>@averages.noon</td>
+        <td>@averages.evening</td>
+      </tr>
+    </table>
+  </div>
 
-  <p># of entries: @entries.size</p>
+  <h4>Readings</h4>
+  <div class="well">
   <table class="table">
     <tr>
 
-  	  <th>date</th>
-  	  <th>reading time</th>
-  	  <th>reading</th>
-  	  <th>nutrition</th>
-  	  <th>exercise</th>
-  	    @validSession match {
+      <th>date</th>
+      <th>reading time</th>
+      <th>reading</th>
+      <th>nutrition</th>
+      <th>exercise</th>
+        @validSession match {
           case true => { <th/> }
           case false => { }
         }
     </tr>
  
-	@entries.map{entry =>
-	  <tr>
-		
-		<td>@entry.readingDate</td>
-				<td>
-		@entry.readingTime match {
-			case 1 => { morning }
-			case 2 => { afternoon }
-			case 3 => { evening }
-			case _ => { NA }
-	    }
-		</td>
-		
-		<td>@entry.reading</td>
-		
-		<td>
-		@entry.nutrition match {
-			case 1 => { poor }
-			case 2 => { adequate }
-			case 3 => { good }
-			case _ => { NA }
-		}
-		</td>
+  @entries.map{entry =>
+    <tr>
+    
+    <td>@entry.readingDate</td>
+        <td>
+    @entry.readingTime match {
+      case 1 => { morning }
+      case 2 => { afternoon }
+      case 3 => { evening }
+      case _ => { NA }
+      }
+    </td>
+    
+    <td>@entry.reading</td>
+    
+    <td>
+    @entry.nutrition match {
+      case 1 => { poor }
+      case 2 => { adequate }
+      case 3 => { good }
+      case _ => { NA }
+    }
+    </td>
 
-		<td>
-		@entry.exercise match {
-			case false => { no }
-			case true => { yes }
-		}
-		</td>
-		@validSession match {
+    <td>
+    @entry.exercise match {
+      case false => { no }
+      case true => { yes }
+    }
+    </td>
+    @validSession match {
           case true => { 
-			<td>
-			  <a href="/entries/@entry.id/delete" method="GET" class="btn btn-link">
-			    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-				delete
-			  </a>
-		    </td>
-		  } case false => { }
+      <td>
+        <a href="/entries/@entry.id/delete" method="GET" class="btn btn-link">
+          <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+        delete
+        </a>
+        </td>
+      } case false => { }
         }
 
-	  </tr>
-	}
+    </tr>
+  }
   </table>
+</div>
   
   @validSession match {
     case true => { <a href="@routes.Instrument.create" class="btn btn-default">Add Entry</a> }

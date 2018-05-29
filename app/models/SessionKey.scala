@@ -7,9 +7,8 @@ import slick.dbio
 import slick.dbio.Effect.Read
 import slick.jdbc.JdbcProfile
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Await
+import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration.Duration
-import scala.concurrent.Future
 import scala.util.Random
 
 case class SessionKey(id: Long, sessionKey: String, userId: Long)
