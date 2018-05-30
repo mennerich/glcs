@@ -1,6 +1,6 @@
 @(authForm: Form[Auth])(implicit request: RequestHeader, messagesProvider: MessagesProvider)
 
-@main("Login", false) {
+@nav("Login", false) {
   
   
   @helper.form(action = routes.Authentication.authenticate) {

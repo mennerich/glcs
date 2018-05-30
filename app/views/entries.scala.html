@@ -1,6 +1,6 @@
 @(entries: List[Entry], validSession: Boolean, averages: helpers.Averages)(implicit request: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
-@main("Entries", validSession) {
+@nav("Entries", validSession) {
 
   @flash.get("success") match {
     case Some(s) => { <div class="alert alert-success" role="alert">@s</div>}

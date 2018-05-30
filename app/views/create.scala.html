@@ -1,6 +1,6 @@
 @(entryForm: Form[models.EntryData])(implicit request: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
-@main("create an entry", true) {
+@nav("create an entry", true) {
   
   
   @helper.form(action = routes.Instrument.submit()) {

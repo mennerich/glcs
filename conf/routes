@@ -1,12 +1,15 @@
 GET     /assets/*file               		controllers.Assets.versioned(path="/public", file: Asset)
 
+GET 	/about								controllers.Instrument.about							
 
-### New Stuff
+
+### Entries
 GET		/									controllers.Instrument.listEntries
 GET		/create								controllers.Instrument.create
 POST	/submit								controllers.Instrument.submit
 GET  	/entries/:id/delete					controllers.Instrument.delete(id: Long)
 
+### Users
 GET 	/user/create						controllers.Authentication.create
 POST	/user/submit						controllers.Authentication.submit
 GET 	/user/login							controllers.Authentication.login

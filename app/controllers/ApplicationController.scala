@@ -103,5 +103,16 @@ class Instrument @Inject()
     entryRepo.delete(id)
     Future(Redirect(routes.Instrument.listEntries).flashing("success" -> "entry deleted"))
   }
+
+    def about() = Action {  implicit request =>
+    request.session.get("glcs-session").map { sessionKey =>
+      sessionKeyRepo.keyExists(sessionKey) match {
+        case true => Ok(views.html.about(true))
+        case false => Ok(views.html.about(false))
+      }
+    }.getOrElse {
+      Ok(views.html.about(false))
+    }
+  }
   
 }
