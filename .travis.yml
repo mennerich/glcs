@@ -1,13 +1,12 @@
 language: scala
 scala:
 - 2.12.2
-jdk: oraclejdk8
+jdk: openjdk8
 sudo: false
 services:
   - mysql
 before_install:
   - mysql -e 'CREATE DATABASE glcs;'
-  - mysql -e 'CREATE DATABASE glcs_test;'
 cache:
   directories:
     - $HOME/.ivy2/cache

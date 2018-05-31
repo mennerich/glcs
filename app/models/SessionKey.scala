@@ -37,12 +37,27 @@ class SessionKeyRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     }
   }
 
+  def findIdBySessionKey(sessionKey: String): Option[Long] = {
+    val action = db.run(_findBySessionKey(sessionKey))
+    val result = Await.result(action, Duration.Inf)
+    result match {
+      case Some(session) => Some(session.userId)
+      case None => None
+    }
+  }
+
   def create(userId: Long, key: String): Future[Long] = {
     val sessionKey = SessionKey(0, key, userId)
     db.run(SessionKeys returning SessionKeys.map(_.id) += sessionKey)
   }
 
   def delete(sessionKey: String): Future[Unit] = db.run(SessionKeys.filter(_.sessionKey === sessionKey).delete).map(_ => ())
+ 
+  def deleteAll: Unit = { 
+    def action = db.run(SessionKeys.delete)
+    Await.result(action, Duration.Inf)
+  }
+ 
 
   private[models] class SessionKeysTable(tag: Tag) extends Table[SessionKey](tag, "SESSION") {
 

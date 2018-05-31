@@ -1,0 +1,11 @@
+# DC schema
+ 
+# --- !Ups
+
+
+ALTER TABLE ENTRY ADD COLUMN USER_ID integer NOT NULL;
+
+
+# --- !Downs
+
+ALTER TABLE ENTRY DROP COLUMN USER_ID

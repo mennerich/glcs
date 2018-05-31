@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import java.sql.Date
 
-case class Entry (id: Long, reading: Int, nutrition: Int, readingTime: Int, readingDate: Date, exercise: Boolean)
+case class Entry (id: Long, reading: Int, nutrition: Int, readingTime: Int, readingDate: Date, exercise: Boolean, userId: Long)
 
 case class EntryData(reading: Int, nutrition: Int, readingTime: Int, readingDate: String, exercise: Boolean)
 
@@ -30,8 +30,8 @@ class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 
   def findById(id: Long): Future[Option[Entry]] = db.run(_findById(id))
 
-  def create(reading: Int, nutrition: Int, readingTime: Int, readingDate: Date, exercise: Boolean): Future[Long] = {
-    val entry = Entry(0, reading, nutrition, readingTime, readingDate, exercise)
+  def create(reading: Int, nutrition: Int, readingTime: Int, readingDate: Date, exercise: Boolean, userId: Long): Future[Long] = {
+    val entry = Entry(0, reading, nutrition, readingTime, readingDate, exercise, userId)
     db.run(Entries returning Entries.map(_.id) += entry)
   }
 
@@ -46,10 +46,11 @@ class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
     def readingTime = column[Int]("READING_TIME")
     def readingDate = column[Date]("READING_DATE")
     def exercise = column[Boolean]("EXERCISE")
-    def * = (id, reading, nutrition, readingTime, readingDate, exercise) <> (Entry.tupled, Entry.unapply)
-    def ? = (id.?, reading.?, nutrition.?, readingTime.?, readingDate.?, exercise.?)
+    def userId = column[Long]("USER_ID")
+    def * = (id, reading, nutrition, readingTime, readingDate, exercise, userId) <> (Entry.tupled, Entry.unapply)
+    def ? = (id.?, reading.?, nutrition.?, readingTime.?, readingDate.?, exercise.?, userId.?)
       .shaped.<>( { r => import 
-        r._; _1.map(_ => Entry.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get))) 
+        r._; _1.map(_ => Entry.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get))) 
     }, 
     (_: Any) => throw new Exception("Inserting into ? projection not supported."))
   }

@@ -9,7 +9,7 @@ case class Counts(morning: Int, noon: Int, evening: Int)
 
 trait StatsSupport {
   def getAverages(xs: List[Entry]): Averages = {
-    val size = xs.size.toDouble
+    val size = xs.size
     
     @tailrec
     def inner(entries: List[Entry], averages: Averages, counts: Counts): Averages = {
@@ -40,18 +40,24 @@ trait StatsSupport {
             case _ => throw new Exception
           }
         }
+
         case Nil => new Averages(
-          round(averages.total / size), 
-          round(averages.morning / counts.morning), 
-          round(averages.noon / counts.noon), 
-          round(averages.evening / counts.evening))
+          round(averages.total,size), 
+          round(averages.morning,counts.morning), 
+          round(averages.noon,counts.noon), 
+          round(averages.evening,counts.evening))
       }
     }
     
     inner(xs, Averages(0.0, 0.0, 0.0, 0.0), Counts(0,0,0))
   }
 
-  private def round(double: Double): Double = { BigDecimal(double).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble }
+  private def round(sum: Double, count: Int): Double = {
+    count match {
+      case 0 => 0.00
+      case _ => BigDecimal(sum).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble 
+    }
+  }
 
 }
 

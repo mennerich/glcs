@@ -11,7 +11,6 @@ import play.api.test.Helpers._
 import play.api.test._
 import testhelpers.{EvolutionHelper, Injector}
 import play.api.inject.guice.GuiceApplicationBuilder
-
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
