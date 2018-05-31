@@ -55,7 +55,7 @@ trait StatsSupport {
   private def round(sum: Double, count: Int): Double = {
     count match {
       case 0 => 0.00
-      case _ => BigDecimal(sum).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble 
+      case _ => BigDecimal(sum.toDouble / count.toDouble).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble 
     }
   }
 
