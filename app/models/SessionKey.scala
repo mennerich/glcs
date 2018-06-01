@@ -65,11 +65,6 @@ class SessionKeyRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     def sessionKey = column[String]("SESSION_KEY")
     def userId = column[Long]("USER_ID")
     def * = (id, sessionKey, userId) <> (SessionKey.tupled, SessionKey.unapply)
-    def ? = (id.?, sessionKey.?, userId.?)
-      .shaped.<>( { r => import 
-        r._; _1.map(_ => SessionKey.tupled((_1.get, _2.get, _3.get))) 
-    }, 
-    (_: Any) => throw new Exception("Inserting into ? projection not supported."))
   }
 
 }

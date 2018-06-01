@@ -65,13 +65,8 @@ class UserRepo @Inject()(sessionKeyRepo: SessionKeyRepo, protected val dbConfigP
     def email = column[String]("EMAIL")
     def hash = column[String]("HASH")
     def salt = column[String]("SALT")
-
     def * = (id, email, hash, salt) <> (User.tupled, User.unapply)
-    def ? = (id.?, email.?, hash.?, salt.?)
-      .shaped.<>( { r => import 
-        r._; _1.map(_ => User.tupled((_1.get, _2.get, _3.get, _4.get))) 
-    }, 
-    (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+
   }
 
 }

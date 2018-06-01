@@ -48,11 +48,6 @@ class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
     def exercise = column[Boolean]("EXERCISE")
     def userId = column[Long]("USER_ID")
     def * = (id, reading, nutrition, readingTime, readingDate, exercise, userId) <> (Entry.tupled, Entry.unapply)
-    def ? = (id.?, reading.?, nutrition.?, readingTime.?, readingDate.?, exercise.?, userId.?)
-      .shaped.<>( { r => import 
-        r._; _1.map(_ => Entry.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get))) 
-    }, 
-    (_: Any) => throw new Exception("Inserting into ? projection not supported."))
   }
 
 }
