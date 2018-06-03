@@ -1,0 +1,11 @@
+# DC schema
+ 
+# --- !Ups
+
+
+ALTER TABLE ENTRY ADD COLUMN WEIGHT integer;
+
+
+# --- !Downs
+
+ALTER TABLE ENTRY DROP COLUMN WEIGHT;

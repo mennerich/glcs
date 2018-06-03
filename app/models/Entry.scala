@@ -9,9 +9,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import java.sql.Date
 
-case class Entry (id: Long, reading: Int, nutrition: Int, readingTime: Int, readingDate: Date, exercise: Boolean, userId: Long)
+case class Entry (id: Long, reading: Int, nutrition: Int, readingTime: Int, readingDate: Date, exercise: Boolean, userId: Long, weight: Option[Int])
 
-case class EntryData(reading: Int, nutrition: Int, readingTime: Int, readingDate: String, exercise: Boolean)
+case class EntryData(reading: Int, nutrition: Int, readingTime: Int, readingDate: String, exercise: Boolean, weight: Option[Int])
 
 class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) {
   
@@ -30,8 +30,8 @@ class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 
   def findById(id: Long): Future[Option[Entry]] = db.run(_findById(id))
 
-  def create(reading: Int, nutrition: Int, readingTime: Int, readingDate: Date, exercise: Boolean, userId: Long): Future[Long] = {
-    val entry = Entry(0, reading, nutrition, readingTime, readingDate, exercise, userId)
+  def create(reading: Int, nutrition: Int, readingTime: Int, readingDate: Date, exercise: Boolean, userId: Long, weight: Option[Int]): Future[Long] = {
+    val entry = Entry(0, reading, nutrition, readingTime, readingDate, exercise, userId, weight)
     db.run(Entries returning Entries.map(_.id) += entry)
   }
 
@@ -47,7 +47,8 @@ class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
     def readingDate = column[Date]("READING_DATE")
     def exercise = column[Boolean]("EXERCISE")
     def userId = column[Long]("USER_ID")
-    def * = (id, reading, nutrition, readingTime, readingDate, exercise, userId) <> (Entry.tupled, Entry.unapply)
+    def weight = column[Option[Int]]("WEIGHT")
+    def * = (id, reading, nutrition, readingTime, readingDate, exercise, userId, weight) <> (Entry.tupled, Entry.unapply)
   }
 
 }

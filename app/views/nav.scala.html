@@ -1,28 +1,25 @@
 @(title: String, validSession: Boolean)(content: Html)
 
 @main(title, validSession) {
-<nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="/">GLCS.CH</a>
-        </div>
-        <div id="navbar" class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li>
-              @validSession match {
-                case true => { <a href="@routes.Authentication.logout">Logout</a> }
-                case false => { <a href="@routes.Authentication.login">Login</a> }
-              }
-            </li>
-            <li>
-              <a href="@routes.Instrument.about">About</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>  
+  <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
-      @content
+      <div class="navbar-header">
+        <a class="navbar-brand" href="/">GLCS.CH</a>
+      </div>
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li>
+            @validSession match {
+              case true => { <a href="@routes.Authentication.logout">Logout</a> }
+              case false => { <a href="@routes.Authentication.login">Login</a> }
+            }
+          </li>
+          <li>
+            <a href="@routes.Instrument.about">About</a>
+          </li>
+        </ul>
+      </div>
     </div>
-
+  </nav>  
+  <div class="container">@content</div>
 }

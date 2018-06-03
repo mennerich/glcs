@@ -41,7 +41,8 @@ class Instrument @Inject()
       "nutrition" -> number,
       "readingTime" -> number,
       "readingDate" -> nonEmptyText,
-      "exercise" -> boolean )
+      "exercise" -> boolean,
+      "weight" -> optional(number) )
     (EntryData.apply)(EntryData.unapply)
   )
   
@@ -70,19 +71,20 @@ class Instrument @Inject()
         },
         entry => { 
           val t = entry.readingDate.split(" ")(0).split("/")
-
+          println("*******WEIGHT " + entry.weight + " " + entry.weight.getClass)
           entryRepo.create(
             entry.reading, 
             entry.nutrition, 
             entry.readingTime, 
             Date.valueOf(t(2) + "-" + t(0) + "-" + t(1)),
             entry.exercise,
-            sessionKeyRepo.findIdBySessionKey(sessionKey).getOrElse(throw new Exception)
+            sessionKeyRepo.findIdBySessionKey(sessionKey).getOrElse(throw new Exception),
+            entry.weight
 
           ).map(_ => {
             
-            config.getBoolean("glcs.slack.enabled").get match {
-              case true => postToSlack(ws, entry, config.getString("glcs.slack.url").get)
+            config.get[Boolean]("glcs.slack.enabled") match {
+              case true => postToSlack(ws, entry, config.get[String]("glcs.slack.url"))
               case false => 
             }
             
@@ -99,19 +101,20 @@ class Instrument @Inject()
   def listEntries = Action.async { implicit request =>
     
     request.session.get("glcs-session").map { sessionKey =>
-      val sessionValid = sessionKeyRepo.keyExists(sessionKey)
+
       val action = entryRepo.all
       val entries = Await.result(action, Duration.Inf)
       val averages: Averages = getAverages(entries)
       
-      Future(Ok(views.html.entries(entries, sessionValid, averages)))
-
-
+      sessionKeyRepo.keyExists(sessionKey) match {
+        case true => Future(Ok(views.html.entriesValid(entries, averages)))
+        case false => Future(Ok(views.html.entries(entries, averages)).flashing("error" -> "session not found, please log in"))
+      }
     }.getOrElse {
       entryRepo.all.map(
         entries => {
           val averages: Averages = getAverages(entries)
-          Ok(views.html.entries(entries, false, averages))
+          Ok(views.html.entries(entries, averages))
         }
       )
     }

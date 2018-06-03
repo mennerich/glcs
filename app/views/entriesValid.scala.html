@@ -1,6 +1,6 @@
 @(entries: List[Entry], averages: helpers.Averages)(implicit request: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
-@nav("Entries", false) {
+@nav("Entries", true) {
   @flash.get("success") match {
     case Some(s) => { <div class="alert alert-success" role="alert">@s</div>}
     case None => { }
@@ -32,6 +32,7 @@
       <th>date</th>
       <th>reading time</th>
       <th>reading</th>
+      <th>weight</th>
       <th>nutrition</th>
       <th>exercise</th>
     </tr>
@@ -45,6 +46,7 @@
         case _ => {NA}
         }</td>
       <td>@entry.reading</td>
+      <td>@entry.weight</td>
       <td>@entry.nutrition match {
         case 1 => {poor}
         case 2 => {adequate}
@@ -57,4 +59,5 @@
       }</td>
     </tr>}
   </table> 
+  <a href="@routes.Instrument.create" class="btn btn-default">Add Entry</a>
 }
