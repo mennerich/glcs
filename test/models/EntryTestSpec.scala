@@ -45,7 +45,7 @@ class EntryModelTestSpec extends PlaySpec with GuiceOneAppPerTest  with BeforeAn
       Await.result(create, Duration.Inf)
       val update = entryRepo.update(Entry(1, 231, 1, 1, now, true, 1, Some(100))).flatMap(_ => entryRepo.all)
       val result = Await.result(update, Duration.Inf)
-      result mustBe List(Entry(2, 231, 1, 1, now, true, 1, Some(100)))
+      result mustBe List(Entry(1, 231, 1, 1, now, true, 1, Some(100)))
     }
 
     "and be added and deleted in the fourth case" in {
