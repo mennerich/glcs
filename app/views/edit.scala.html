@@ -1,10 +1,10 @@
 @(entryForm: Form[models.Entry])(implicit request: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
-@nav("Add A Reading", true) {  
+@nav("Edit An Entry", true) {  
   
-  @helper.form(action = routes.Instrument.submit()) {
+  @helper.form(action = routes.Instrument.update()) {
     
-    @form(entryForm, true, "Add A Reading")
+    @form(entryForm, false, "Edit An Entry")
 
   }
 

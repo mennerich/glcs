@@ -1,7 +1,7 @@
 package helpers
 
 import javax.inject.Inject
-import models.EntryData
+import models.Entry
 import play.api.libs.ws._
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
@@ -14,7 +14,7 @@ trait SlackSupport {
   val nutrition = Map(1 -> "poor", 2 -> "adequate", 3 -> "good")
   val exercise = Map(false -> "did not exercise", true -> "exercised")
 
-  def postToSlack(ws: WSClient, entry: EntryData, slackUrl: String) {
+  def postToSlack(ws: WSClient, entry: Entry, slackUrl: String) {
   
   	val request: WSRequest = ws
   	  .url(slackUrl)

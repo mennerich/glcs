@@ -7,7 +7,9 @@ GET 	/about								controllers.Instrument.about
 GET		/									controllers.Instrument.listEntries
 GET		/create								controllers.Instrument.create
 POST	/submit								controllers.Instrument.submit
-GET  	/entries/:id/delete					controllers.Instrument.delete(id: Long)
+GET  	/entries/:id/delete					controllers.Instrument.delete(id: Int)
+GET		/entries/:id/edit					controllers.Instrument.edit(id: Int)
+POST 	/update								controllers.Instrument.update
 
 ### Users
 GET 	/user/create						controllers.Authentication.create

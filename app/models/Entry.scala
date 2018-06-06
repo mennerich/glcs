@@ -9,9 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import java.sql.Date
 
-case class Entry (id: Long, reading: Int, nutrition: Int, readingTime: Int, readingDate: Date, exercise: Boolean, userId: Long, weight: Option[Int])
-
-case class EntryData(reading: Int, nutrition: Int, readingTime: Int, readingDate: String, exercise: Boolean, weight: Option[Int])
+case class Entry (id: Int, reading: Int, nutrition: Int, readingTime: Int, readingDate: Date, exercise: Boolean, userId: Int, weight: Option[Int])
 
 class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) {
   
@@ -26,27 +24,26 @@ class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
     .to[List].result
   )
 
-  private def _findById(id: Long): DBIO[Option[Entry]] = Entries.filter(_.id === id).result.headOption
+  def findById(id: Int): Future[Option[Entry]] = db.run(Entries.filter(_.id === id).result.headOption)
 
-  def findById(id: Long): Future[Option[Entry]] = db.run(_findById(id))
+  def create(entry: Entry): Future[Int] = { db.run(Entries returning Entries.map(_.id) += entry) }
 
-  def create(reading: Int, nutrition: Int, readingTime: Int, readingDate: Date, exercise: Boolean, userId: Long, weight: Option[Int]): Future[Long] = {
-    val entry = Entry(0, reading, nutrition, readingTime, readingDate, exercise, userId, weight)
-    db.run(Entries returning Entries.map(_.id) += entry)
-  }
-
-  def delete(id: Long): Future[Unit] = db.run(Entries.filter(_.id === id).delete).map(_ => ())
+  def delete(id: Int): Future[Unit] = db.run(Entries.filter(_.id === id).delete).map(_ => ())
   
+  def update(entry: Entry): Future[Int] = {
+    delete(entry.id)
+    create(entry)
+  }
 
   private[models] class EntriesTable(tag: Tag) extends Table[Entry](tag, "ENTRY") {
 
-    def id = column[Long]("ID", O.AutoInc, O.PrimaryKey)
+    def id = column[Int]("ID", O.AutoInc, O.PrimaryKey)
     def reading = column[Int]("READING")
     def nutrition = column[Int]("NUTRITION")
     def readingTime = column[Int]("READING_TIME")
     def readingDate = column[Date]("READING_DATE")
     def exercise = column[Boolean]("EXERCISE")
-    def userId = column[Long]("USER_ID")
+    def userId = column[Int]("USER_ID")
     def weight = column[Option[Int]]("WEIGHT")
     def * = (id, reading, nutrition, readingTime, readingDate, exercise, userId, weight) <> (Entry.tupled, Entry.unapply)
   }

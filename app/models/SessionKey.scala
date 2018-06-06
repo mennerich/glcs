@@ -11,7 +11,7 @@ import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration.Duration
 import scala.util.Random
 
-case class SessionKey(id: Long, sessionKey: String, userId: Long)
+case class SessionKey(id: Int, sessionKey: String, userId: Int)
 
 class SessionKeyRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) {
   
@@ -22,9 +22,9 @@ class SessionKeyRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPro
 
   def all: Future[List[SessionKey]] = db.run(SessionKeys.to[List].result)
 
-  private def _findById(id: Long): DBIO[Option[SessionKey]] = SessionKeys.filter(_.id === id).result.headOption
+  private def _findById(id: Int): DBIO[Option[SessionKey]] = SessionKeys.filter(_.id === id).result.headOption
 
-  def findById(id: Long): Future[Option[SessionKey]] = db.run(_findById(id))
+  def findById(id: Int): Future[Option[SessionKey]] = db.run(_findById(id))
 
   private def _findBySessionKey(sessionKey: String): DBIO[Option[SessionKey]] = SessionKeys.filter(_.sessionKey === sessionKey).result.headOption
   
@@ -37,7 +37,7 @@ class SessionKeyRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     }
   }
 
-  def findIdBySessionKey(sessionKey: String): Option[Long] = {
+  def findIdBySessionKey(sessionKey: String): Option[Int] = {
     val action = db.run(_findBySessionKey(sessionKey))
     val result = Await.result(action, Duration.Inf)
     result match {
@@ -46,7 +46,7 @@ class SessionKeyRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     }
   }
 
-  def create(userId: Long, key: String): Future[Long] = {
+  def create(userId: Int, key: String): Future[Int] = {
     val sessionKey = SessionKey(0, key, userId)
     db.run(SessionKeys returning SessionKeys.map(_.id) += sessionKey)
   }
@@ -61,9 +61,9 @@ class SessionKeyRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPro
 
   private[models] class SessionKeysTable(tag: Tag) extends Table[SessionKey](tag, "SESSION") {
 
-    def id = column[Long]("ID", O.AutoInc, O.PrimaryKey)
+    def id = column[Int]("ID", O.AutoInc, O.PrimaryKey)
     def sessionKey = column[String]("SESSION_KEY")
-    def userId = column[Long]("USER_ID")
+    def userId = column[Int]("USER_ID")
     def * = (id, sessionKey, userId) <> (SessionKey.tupled, SessionKey.unapply)
   }
 

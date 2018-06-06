@@ -9,52 +9,66 @@
     case Some(e) => { <div class="alert alert-danger" role="alert"> @e </div> }
     case None => { }
   }
-    <h4>Average MG/DL</h4>
-    <div class="well">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>Average MG/DL</h4>
+    </div>
     <table class="table">
-      <tr>
-        <th>total</th>
-        <th>morning</th>
-        <th>afternoon</th>
-        <th>evening</th>
-      </tr>
-      <tr>
-        <td>@averages.total</td>
-        <td>@averages.morning</td>
-        <td>@averages.noon</td>
-        <td>@averages.evening</td>
-      </tr>
+      <thead>
+        <tr>
+          <th>total</th>
+          <th>morning</th>
+          <th>afternoon</th>
+          <th>evening</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>@averages.total</td>
+          <td>@averages.morning</td>
+          <td>@averages.noon</td>
+          <td>@averages.evening</td>
+        </tr>
+      </tbody>
     </table>
   </div>
-  <h4>Readings</h4>
-  <table class="table">
-    <tr>
-      <th>date</th>
-      <th>reading time</th>
-      <th>reading</th>
-      <th>nutrition</th>
-      <th>exercise</th>
-    </tr>
-    @entries.map { entry =>
-    <tr> 
-      <td>@entry.readingDate</td>
-      <td>@entry.readingTime match {
-        case 1 => {morning}
-        case 2 => {afternoon}
-        case 3 => {evening}
-        case _ => {NA}
-        }</td>
-      <td>@entry.reading</td>
-      <td>@entry.nutrition match {
-        case 1 => {poor}
-        case 2 => {adequate}
-        case 3 => {good}
-        case _ => {NA}
-      }</td>
-      <td>@entry.exercise match {
-        case false => {no}
-        case true => {yes}
-      }</td>
-    </tr>}
-  </table> 
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4>Readings</h4>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>date</th>
+          <th>reading time</th>
+          <th>reading</th>
+          <th>nutrition</th>
+          <th>exercise</th>
+        </tr>
+      </thead>
+      <tbody class="scroll">
+        @entries.map { entry =>
+        <tr> 
+          <td>@entry.readingDate</td>
+          <td>@entry.readingTime match {
+            case 1 => {morning}
+            case 2 => {afternoon}
+            case 3 => {evening}
+            case _ => {NA}
+            }</td>
+          <td>@entry.reading</td>
+          <td>@entry.nutrition match {
+            case 1 => {poor}
+            case 2 => {adequate}
+            case 3 => {good}
+            case _ => {NA}
+          }</td>
+          <td>@entry.exercise match {
+            case false => {no}
+            case true => {yes}
+          }</td>
+        </tr>}
+      </tbody>
+    </table>
+  </div>
 }

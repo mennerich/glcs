@@ -13,7 +13,7 @@ import scala.concurrent.Future
 import scala.util.Random
 
 
-case class User(id: Long, email: String, hash: String, salt: String)
+case class User(id: Int, email: String, hash: String, salt: String)
 
 class UserRepo @Inject()(sessionKeyRepo: SessionKeyRepo, protected val dbConfigProvider: DatabaseConfigProvider) {
 
@@ -25,11 +25,11 @@ class UserRepo @Inject()(sessionKeyRepo: SessionKeyRepo, protected val dbConfigP
 
   def all: Future[List[User]] = db.run(Users.to[List].result)
 
-  private def _findById(id: Long): DBIO[Option[User]] = Users.filter(_.id === id).result.headOption
+  private def _findById(id: Int): DBIO[Option[User]] = Users.filter(_.id === id).result.headOption
 
-  def findById(id: Long): Future[Option[User]] = db.run(_findById(id))
+  def findById(id: Int): Future[Option[User]] = db.run(_findById(id))
 
-  def create(email: String, password: String): Future[Long] = {
+  def create(email: String, password: String): Future[Int] = {
   	val salt = Random.alphanumeric.take(10).mkString
   	val hash = DigestUtils.md5Hex(password + salt)
     val entry = User(0, email, hash, salt)
@@ -61,7 +61,7 @@ class UserRepo @Inject()(sessionKeyRepo: SessionKeyRepo, protected val dbConfigP
 
   private[models] class UsersTable(tag: Tag) extends Table[User](tag, "USER") {
 
-    def id = column[Long]("ID", O.AutoInc, O.PrimaryKey)
+    def id = column[Int]("ID", O.AutoInc, O.PrimaryKey)
     def email = column[String]("EMAIL")
     def hash = column[String]("HASH")
     def salt = column[String]("SALT")
