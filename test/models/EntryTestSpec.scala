@@ -34,9 +34,7 @@ class EntryModelTestSpec extends PlaySpec with GuiceOneAppPerTest  with BeforeAn
 
     "and not exist in the second test case" in  {
         val action = entryRepo.all
-
         val result = Await.result(action, Duration.Inf)
-
         result mustBe List.empty
     }
 
