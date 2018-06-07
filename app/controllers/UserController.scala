@@ -31,10 +31,10 @@ class Authentication @Inject()
       request.session.get("glcs-session").map { sessionKey =>
         sessionKeyRepo.keyExists(sessionKey) match {
           case true => Ok(views.html.users.create(authForm))
-          case false => Redirect(routes.Instrument.listEntries).flashing("error" -> "you must be logged in to create an user")
+          case false => Redirect(routes.Instrument.listEntries(0)).flashing("error" -> "you must be logged in to create an user")
         }
       }.getOrElse {
-        Redirect(routes.Instrument.listEntries).flashing("error" -> "you must be logged in to create a user")
+        Redirect(routes.Instrument.listEntries(0)).flashing("error" -> "you must be logged in to create a user")
       }
     }
 
@@ -45,9 +45,9 @@ class Authentication @Inject()
     def logout() = Action { implicit request  =>
       request.session.get("glcs-session").map { session =>
         sessionKeyRepo.delete(session)
-        Redirect(routes.Instrument.listEntries).withNewSession
+        Redirect(routes.Instrument.listEntries(0)).withNewSession
       }.getOrElse {
-        Redirect(routes.Instrument.listEntries).flashing("error" -> "session not available")
+        Redirect(routes.Instrument.listEntries(0)).flashing("error" -> "session not available")
       }
       
     }
@@ -58,7 +58,7 @@ class Authentication @Inject()
             Future(Ok("wrong")) 
           },
           user => { userRepo.create(user.email, user.password) 
-        .map(id => Redirect(routes.Instrument.listEntries).flashing("success" -> "user created"))
+        .map(id => Redirect(routes.Instrument.listEntries(0)).flashing("success" -> "user created"))
           }
       )
     }
@@ -66,17 +66,17 @@ class Authentication @Inject()
     def authenticate() = Action.async { implicit request =>
       authForm.bindFromRequest.fold(
           formWithErrors => {
-            Future(Redirect(routes.Instrument.listEntries).flashing("error" -> "invalid form"))
+            Future(Redirect(routes.Instrument.listEntries(0)).flashing("error" -> "invalid form"))
           },
           user => {
             userRepo.authenticate(user.email, user.password) match {
               case Some(s) => {
-                Future(Redirect(routes.Instrument.listEntries)
+                Future(Redirect(routes.Instrument.listEntries(0))
                   .withSession("glcs-session" -> s)
                   .flashing("success" -> "successfuly logged in")
                 )
               }
-              case None => Future(Redirect(routes.Instrument.listEntries).flashing("error" -> "login failed"))
+              case None => Future(Redirect(routes.Instrument.listEntries(0)).flashing("error" -> "login failed"))
             }
           } 
       )

@@ -48,6 +48,32 @@ class Instrument @Inject()
     (Entry.apply)(Entry.unapply)
   )
   
+  def index = Action { Redirect(routes.Instrument.listEntries(0)) }
+
+  def listEntries(page: Int) = Action.async { implicit request =>
+    
+    request.session.get("glcs-session").map { sessionKey =>
+
+      val list = entryRepo.listEntries(page * 10, 10)
+      val entries = Await.result(list, Duration.Inf)
+
+      val all = entryRepo.all
+      val averages: Averages = getAverages(Await.result(all, Duration.Inf))
+      
+      sessionKeyRepo.keyExists(sessionKey) match {
+        case true => Future(Ok(views.html.entriesValid(entries, averages, page)))
+        case false => Future(Ok(views.html.entries(entries, averages, page)))
+      }
+    }.getOrElse {
+      entryRepo.listEntries(10, page).map(
+        entries => {
+          val averages: Averages = getAverages(entries)
+          Ok(views.html.entries(entries, averages, page))
+        }
+      )
+    }
+  }
+
   def create() = Action {  implicit request =>
     request.session.get("glcs-session").map { sessionKey =>
       sessionKeyRepo.keyExists(sessionKey) match {
@@ -55,11 +81,11 @@ class Instrument @Inject()
           Ok(views.html.create(form))
         }
         case false => {
-          Redirect(routes.Instrument.listEntries).flashing("error" -> "you must be logged in to create an entry")
+          Redirect(routes.Instrument.listEntries(0)).flashing("error" -> "you must be logged in to create an entry")
         }
       }
     }.getOrElse {
-        Redirect(routes.Instrument.listEntries).flashing("error" -> "you must be logged in to create an entry")
+        Redirect(routes.Instrument.listEntries(0)).flashing("error" -> "you must be logged in to create an entry")
     }
   }
 
@@ -68,7 +94,7 @@ class Instrument @Inject()
     request.session.get("glcs-session").map { sessionKey =>
       form.bindFromRequest.fold(
         formWithErrors => { 
-          Future(Redirect(routes.Instrument.listEntries).flashing("error" -> "invalid form"))
+          Future(Redirect(routes.Instrument.listEntries(0)).flashing("error" -> "invalid form"))
         },
         entry => { 
           entryRepo.create(
@@ -89,13 +115,13 @@ class Instrument @Inject()
               case false => 
             }
             
-            Redirect(routes.Instrument.listEntries).flashing("success" -> "glcs entry created")
+            Redirect(routes.Instrument.listEntries(0)).flashing("success" -> "glcs entry created")
           
           })
         }
       )
     }.getOrElse {
-        Future(Redirect(routes.Instrument.listEntries).flashing("error" -> "you must be logged in to create an entry"))
+        Future(Redirect(routes.Instrument.listEntries(0)).flashing("error" -> "you must be logged in to create an entry"))
     }
   }
 
@@ -124,54 +150,32 @@ class Instrument @Inject()
 
               Future(Ok(views.html.edit(filledForm)))
             }
-            case None => Future(Redirect(routes.Instrument.listEntries).flashing("error" -> s"${id} not found in system"))
+            case None => Future(Redirect(routes.Instrument.listEntries(0)).flashing("error" -> s"${id} not found in system"))
           }
         }
-        case false => Future(Redirect(routes.Instrument.listEntries).flashing("error" -> "you must be logged in to edit an entry"))
+        case false => Future(Redirect(routes.Instrument.listEntries(0)).flashing("error" -> "you must be logged in to edit an entry"))
       }
     }.getOrElse {
-      Future(Redirect(routes.Instrument.listEntries).flashing("error" -> "invalid session, you must be logged in to edit an entry"))
+      Future(Redirect(routes.Instrument.listEntries(0)).flashing("error" -> "invalid session, you must be logged in to edit an entry"))
     }
   }
 
   def update() = Action.async { implicit request =>
     form.bindFromRequest.fold(
       formWithErrors => { 
-        Future(Redirect(routes.Instrument.listEntries).flashing("error" -> "invalid form"))
+        Future(Redirect(routes.Instrument.listEntries(0)).flashing("error" -> "invalid form"))
       },
       entry => {
         entryRepo.update(entry).map(_ => {
-          Redirect(routes.Instrument.listEntries).flashing("success" -> s"${entry.id} updated")
+          Redirect(routes.Instrument.listEntries(0)).flashing("success" -> s"${entry.id} updated")
         })
       }
     )
   }
 
-  def listEntries = Action.async { implicit request =>
-    
-    request.session.get("glcs-session").map { sessionKey =>
-
-      val action = entryRepo.all
-      val entries = Await.result(action, Duration.Inf)
-      val averages: Averages = getAverages(entries)
-      
-      sessionKeyRepo.keyExists(sessionKey) match {
-        case true => Future(Ok(views.html.entriesValid(entries, averages)))
-        case false => Future(Ok(views.html.entries(entries, averages)))
-      }
-    }.getOrElse {
-      entryRepo.all.map(
-        entries => {
-          val averages: Averages = getAverages(entries)
-          Ok(views.html.entries(entries, averages))
-        }
-      )
-    }
-  }
-
   def delete(id: Int) = Action.async { implicit request =>
     entryRepo.delete(id)
-    Future(Redirect(routes.Instrument.listEntries).flashing("success" -> "entry deleted"))
+    Future(Redirect(routes.Instrument.listEntries(0)).flashing("success" -> "entry deleted"))
   }
 
   def about() = Action {  implicit request =>

@@ -1,0 +1,7 @@
+@(page: Int)
+@(page > 0) match {
+  case true => {  <a href="@routes.Instrument.listEntries(page - 1)">Next</a> }
+  case false => { }
+}
+@{page + 1}
+<a href="@routes.Instrument.listEntries(page + 1)">Previous</a> 

@@ -19,11 +19,17 @@ class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
   private[models] val Entries = TableQuery[EntriesTable]
 
   def all: Future[List[Entry]] = db.run(
-    Entries.sortBy(_.readingDate.desc)
-    .sortBy(m => (m.readingDate.desc, m.readingTime.desc))
+    Entries.sortBy(m => (m.readingDate.desc, m.readingTime.desc))
     .to[List].result
   )
 
+  def listEntries(offset: Int, size: Int): Future[List[Entry]] = {
+    db.run(
+      Entries.sortBy(m => (m.readingDate.desc, m.readingTime.desc))
+      .drop(offset).take(size)
+      .to[List].result
+    )
+  }
   def findById(id: Int): Future[Option[Entry]] = db.run(Entries.filter(_.id === id).result.headOption)
 
   def create(entry: Entry): Future[Int] = db.run(Entries += entry) 

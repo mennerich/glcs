@@ -1,4 +1,4 @@
-@(entries: List[Entry], averages: helpers.Averages)(implicit request: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(entries: List[Entry], averages: helpers.Averages, page: Int)(implicit request: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
 @nav("Entries", false) {
   @flash.get("success") match {
@@ -71,4 +71,5 @@
       </tbody>
     </table>
   </div>
+  @paging(page)
 }

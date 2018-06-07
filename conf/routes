@@ -4,7 +4,8 @@ GET 	/about								controllers.Instrument.about
 
 
 ### Entries
-GET		/									controllers.Instrument.listEntries
+GET		/									controllers.Instrument.index
+GET		/:page								controllers.Instrument.listEntries(page:Int)
 GET		/create								controllers.Instrument.create
 POST	/submit								controllers.Instrument.submit
 GET  	/entries/:id/delete					controllers.Instrument.delete(id: Int)
