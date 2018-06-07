@@ -27,7 +27,6 @@ class Instrument @Inject()
   val controllerComponents: ControllerComponents) 
   extends BaseController 
   with I18nSupport 
-  with StatsSupport 
   with SlackSupport {
 
   lifecycle.addStopHook { () =>
@@ -51,24 +50,20 @@ class Instrument @Inject()
   def index = Action { Redirect(routes.Instrument.listEntries(0)) }
 
   def listEntries(page: Int) = Action.async { implicit request =>
+    val list = entryRepo.listEntries(page * 10, 10)
+    val entries = Await.result(list, Duration.Inf)
+    val averages = entryRepo.entryAverages
     
     request.session.get("glcs-session").map { sessionKey =>
 
-      val list = entryRepo.listEntries(page * 10, 10)
-      val entries = Await.result(list, Duration.Inf)
-
-      val all = entryRepo.all
-      val averages: Averages = getAverages(Await.result(all, Duration.Inf))
-      
       sessionKeyRepo.keyExists(sessionKey) match {
-        case true => Future(Ok(views.html.entriesValid(entries, averages, page)))
-        case false => Future(Ok(views.html.entries(entries, averages, page)))
+        case true => Future(Ok(views.html.index(entries, averages, page, true)))
+        case false => Future(Ok(views.html.index(entries, averages, page, false)))
       }
     }.getOrElse {
       entryRepo.listEntries(10, page).map(
         entries => {
-          val averages: Averages = getAverages(entries)
-          Ok(views.html.entries(entries, averages, page))
+          Ok(views.html.index(entries, averages, page, false))
         }
       )
     }
@@ -90,7 +85,6 @@ class Instrument @Inject()
   }
 
   def submit() = Action.async { implicit request => 
-
     request.session.get("glcs-session").map { sessionKey =>
       form.bindFromRequest.fold(
         formWithErrors => { 
@@ -109,7 +103,7 @@ class Instrument @Inject()
               entry.weight
             )
           ).map(_ => {
-            
+            // check for slack integration and post to            
             config.get[Boolean]("glcs.slack.enabled") match {
               case true => postToSlack(ws, entry, config.get[String]("glcs.slack.url"))
               case false => 
@@ -179,14 +173,7 @@ class Instrument @Inject()
   }
 
   def about() = Action {  implicit request =>
-    request.session.get("glcs-session").map { sessionKey =>
-      sessionKeyRepo.keyExists(sessionKey) match {
-        case true => Ok(views.html.about(true))
-        case false => Ok(views.html.about(false))
-      }
-    }.getOrElse {
-      Ok(views.html.about(false))
-    }
+    Ok("#")
   }
   
 }

@@ -1,0 +1,16 @@
+@(entries: List[Entry], averages: helpers.Averages, page: Int, hasSession: Boolean)(implicit request: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+
+@main("Recent Entries") {
+
+  @nav(false)
+
+  <div class="container">
+    @flashing()
+    @averageTable(averages)
+    @hasSession match {
+      case true => { @readingsValidated(entries) }
+      case false => { @readings(entries) }
+    }
+    @paging(page)
+  </div>
+}

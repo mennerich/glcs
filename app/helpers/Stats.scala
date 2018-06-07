@@ -2,12 +2,13 @@ package helpers
 
 import scala.annotation.tailrec
 import scala.math.BigDecimal
-import models.Entry
+import models.{ Entry, EntryRepo }
 
 case class Averages(total: Double, morning: Double, noon: Double, evening: Double)
 case class Counts(morning: Int, noon: Int, evening: Int)
 
 trait StatsSupport {
+  
   def getAverages(xs: List[Entry]): Averages = {
     val size = xs.size
     

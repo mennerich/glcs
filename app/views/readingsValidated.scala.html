@@ -1,0 +1,53 @@
+@(entries: List[Entry])
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h4>Readings</h4>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>date</th>
+        <th>reading time</th>
+        <th>reading</th>
+        <th>weight</th>
+        <th>nutrition</th>
+        <th>exercise</th>
+        <th/>
+      </tr>
+    </thead>
+    <tbody>
+      @entries.map { entry =>
+        <tr> 
+          <td>@entry.readingDate</td>
+          <td>@entry.readingTime match {
+            case 1 => {morning}
+            case 2 => {afternoon}
+            case 3 => {evening}
+            case _ => {NA}
+            }</td>
+          <td>@entry.reading</td>
+          <td>@entry.weight</td>
+          <td>@entry.nutrition match {
+            case 1 => {poor}
+            case 2 => {adequate}
+            case 3 => {good}
+            case _ => {NA}
+          }</td>
+          <td>@entry.exercise match {
+            case false => {no}
+            case true => {yes}
+          }</td>
+          <td>
+            <a href="/entries/@entry.id/edit" method="GET" class="btn btn-link">
+              <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+            </a>
+            <a href="/entries/@entry.id/delete" method="GET" class="btn btn-link">
+              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            </a>
+          </td>
+        </tr>
+      }
+    </tbody>  
+  </table> 
+  <a href="@routes.Instrument.create" class="btn btn-default">Add Entry</a>
+</div>

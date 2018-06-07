@@ -1,8 +1,10 @@
 @(authForm: Form[Auth])(implicit request: RequestHeader, messagesProvider: MessagesProvider)
 
-@nav("Login", false) {
+@main("Login") {
   
+  @nav(false)
   
+  <div class="container">
   @helper.form(action = routes.Authentication.authenticate) {
     
   <fieldset>
@@ -18,6 +20,6 @@
       <input type="submit" class="btn btn-default" />
    </fieldset>
   }
-
+  </div>
 
 }

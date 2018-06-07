@@ -1,0 +1,16 @@
+@()(implicit messagesProvider: MessagesProvider, flash: Flash)
+
+@flash.get("success") match {
+  case Some(s) => { <div class="alert alert-success" role="alert">@s</div>}
+  case None => { }
+}
+
+@flash.get("error") match {
+  case Some(e) => { <div class="alert alert-danger" role="alert"> @e </div> }
+  case None => { }
+}
+
+@flash.get("warn")match {
+  case Some(e) => { <div class="alert alert-warn" role="alert"> @e </div> }
+  case None => { }
+}

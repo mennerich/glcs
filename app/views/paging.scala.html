@@ -1,7 +1,14 @@
 @(page: Int)
+<div class="container">
 @(page > 0) match {
-  case true => {  <a href="@routes.Instrument.listEntries(page - 1)">Next</a> }
+  case true => {
+    <a href="@routes.Instrument.listEntries(page - 1)" class="btn btn-link">
+      <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+  </a> }
   case false => { }
 }
-@{page + 1}
-<a href="@routes.Instrument.listEntries(page + 1)">Previous</a> 
+<strong>@{page + 1}</strong>
+<a href="@routes.Instrument.listEntries(page + 1)" class="btn btn-link">
+  <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>	
+</a>
+</div>

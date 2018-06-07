@@ -6,12 +6,14 @@ import slick.dbio
 import slick.dbio.Effect.Read
 import slick.jdbc.JdbcProfile
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ Await, Future }
 import java.sql.Date
+import helpers.{ Averages, StatsSupport }
+import scala.concurrent.duration.Duration
 
 case class Entry (id: Int, reading: Int, nutrition: Int, readingTime: Int, readingDate: Date, exercise: Boolean, userId: Int, weight: Option[Int])
 
-class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) {
+class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends StatsSupport {
   
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   val db = dbConfig.db
@@ -30,6 +32,12 @@ class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
       .to[List].result
     )
   }
+
+  def entryAverages(): Averages = {
+    val action = all
+    getAverages(Await.result(action, Duration.Inf))
+  }
+
   def findById(id: Int): Future[Option[Entry]] = db.run(Entries.filter(_.id === id).result.headOption)
 
   def create(entry: Entry): Future[Int] = db.run(Entries += entry) 

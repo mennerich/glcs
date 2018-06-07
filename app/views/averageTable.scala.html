@@ -1,0 +1,25 @@
+@(averages: helpers.Averages)
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h4>Average MG/DL</h4>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>total</th>
+        <th>morning</th>
+        <th>afternoon</th>
+        <th>evening</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>@averages.total</td>
+        <td>@averages.morning</td>
+        <td>@averages.noon</td>
+        <td>@averages.evening</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
