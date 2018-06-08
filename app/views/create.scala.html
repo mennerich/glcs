@@ -4,12 +4,14 @@
   
   @nav(true) 
   
-  @flashing
-  
-  @helper.form(action = routes.Instrument.submit()) {
+  <div class="container">
+  	
+   
+    @helper.form(action = routes.Instrument.submit()) {
     
-    @form(entryForm, true, "Add A Reading")
+      @form(entryForm, true, "Add A Reading")
 
-  }
+    }
 
+   </div>
 }

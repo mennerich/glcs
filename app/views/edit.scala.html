@@ -4,12 +4,14 @@
   
   @nav(true)
 
-  @flashing 
-  
-  @helper.form(action = routes.Instrument.update()) {
+  <div class="container">
     
-    @form(entryForm, false, "Edit An Entry")
+  
+    @helper.form(action = routes.Instrument.update()) {
+    
+      @form(entryForm, false, "Edit An Entry")
 
-  }
+    }
+  </div>
 
 }

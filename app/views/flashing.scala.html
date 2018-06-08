@@ -11,6 +11,6 @@
 }
 
 @flash.get("warn")match {
-  case Some(e) => { <div class="alert alert-warn" role="alert"> @e </div> }
+  case Some(w) => { <div class="alert alert-warn" role="alert"> @w </div> }
   case None => { }
 }

@@ -2,7 +2,10 @@
 
 @main("Recent Entries") {
 
-  @nav(false)
+  @hasSession match {
+    case true => { @nav(true) }
+    case false => { @nav(false) }
+  }
 
   <div class="container">
     @flashing()
