@@ -10,6 +10,8 @@ import play.api.data.validation.Constraints._
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ Await, ExecutionContext, Future }
+import scala.concurrent.duration.Duration
 
 case class Auth(email: String, password: String)
 
@@ -49,23 +51,49 @@ class Authentication @Inject()
 
   def submit() = Action.async { implicit request =>
     userForm.bindFromRequest.fold(
-        formWithErrors => { 
-          Future(Ok("wrong")) 
-        },
-        user => { userRepo.create(user.email, user.password, user.nick) 
-          .map(id => Redirect(routes.Instrument.listEntries(0)).flashing("success" -> "user created"))
-        }
+      formWithErrors => { 
+        Future(Ok("wrong")) 
+      },
+      user => { userRepo.create(user.email, user.password, user.nick) 
+        .map(id => Redirect(routes.Instrument.listEntries(0)).flashing("success" -> "user created"))
+      }
     )
   }
 
   def edit() = Action { implicit request  =>
     request.session.get("glcs-session").map { sessionKey =>
       sessionKeyRepo.keyExists(sessionKey) match {
-        case true => Ok(views.html.users.edit(userForm))
+        case true => {
+          val session = sessionKeyRepo.findBySessionKey(sessionKey)
+          val result = Await.result(session, Duration.Inf)
+
+          result match {
+            case Some(session) => {
+
+              val action = userRepo.findById(session.userId)
+              val userResult = Await.result(action, Duration.Inf)
+
+              userResult match {
+                case Some(u) => {
+                  val filledForm = userForm.fill(
+                    UserForm(
+                      u.email,
+                      "",
+                      u.nick,
+                    )
+                  )
+                  Ok(views.html.users.edit(filledForm))
+                }
+                case None => Redirect(routes.Instrument.listEntries(0)).flashing("error" -> "you must be logged in to edit a user")
+              }
+            }
+            case None => Redirect(routes.Instrument.listEntries(0)).flashing("error" -> "you must be logged in to edit a user")
+          }
+        }      
         case false => Redirect(routes.Instrument.listEntries(0)).flashing("error" -> "you must be logged in to create an user")
-      }
+      } 
     }.getOrElse {
-      Redirect(routes.Instrument.listEntries(0)).flashing("error" -> "you must be logged in to create a user")
+      Redirect(routes.Instrument.listEntries(0))
     }
   }
 

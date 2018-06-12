@@ -7,6 +7,7 @@
   <table class="table">
     <thead>
       <tr>
+        <th>user</th>
         <th>date</th>
         <th>reading time</th>
         <th>reading</th>
@@ -16,7 +17,8 @@
     </thead>
     <tbody class="scroll">
       @entries.map { entry =>
-      <tr> 
+      <tr>
+        <td>@entry.userId</td> 
         <td>@entry.readingDate</td>
         <td>@entry.readingTime match {
           case 1 => {morning}

@@ -30,6 +30,16 @@ class UserRepo @Inject()(sessionKeyRepo: SessionKeyRepo, protected val dbConfigP
 
   def findById(id: Int): Future[Option[User]] = db.run(_findById(id))
 
+  def findBySessionKey(sessionKey: String): Option[Int] = {
+    val action = sessionKeyRepo.findBySessionKey(sessionKey)
+    val result = Await.result(action, Duration.Inf)
+
+    result match {
+      case Some(key) => Some(key.userId)
+      case None => None 
+    }
+  }
+
   def create(email: String, password: String, nick: String): Future[Int] = {
   	val salt = Random.alphanumeric.take(10).mkString
   	val hash = DigestUtils.md5Hex(password + salt)

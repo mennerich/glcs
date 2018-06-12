@@ -22,9 +22,11 @@ class SessionKeyRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPro
 
   def all: Future[List[SessionKey]] = db.run(SessionKeys.to[List].result)
 
+  def findById(id: Int): Future[Option[SessionKey]] = db.run(_findById(id))
+
   private def _findById(id: Int): DBIO[Option[SessionKey]] = SessionKeys.filter(_.id === id).result.headOption
 
-  def findById(id: Int): Future[Option[SessionKey]] = db.run(_findById(id))
+  def findBySessionKey(sessionKey: String): Future[Option[SessionKey]] = db.run(_findBySessionKey(sessionKey))
 
   private def _findBySessionKey(sessionKey: String): DBIO[Option[SessionKey]] = SessionKeys.filter(_.sessionKey === sessionKey).result.headOption
   
@@ -34,15 +36,6 @@ class SessionKeyRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     result match {
       case Some(s) => true
       case None => false
-    }
-  }
-
-  def findIdBySessionKey(sessionKey: String): Option[Int] = {
-    val action = db.run(_findBySessionKey(sessionKey))
-    val result = Await.result(action, Duration.Inf)
-    result match {
-      case Some(session) => Some(session.userId)
-      case None => None
     }
   }
 

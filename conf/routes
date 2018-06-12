@@ -1,22 +1,21 @@
-GET     /assets/*file               		controllers.Assets.versioned(path="/public", file: Asset)
+GET       /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
-GET 	/about								controllers.Instrument.about							
-
+GET       /about                      controllers.Instrument.about              
 
 ### Entries
-GET		/									controllers.Instrument.index
-GET		/entries/:page						controllers.Instrument.listEntries(page:Int)
-GET		/entry/create								controllers.Instrument.create
-POST	/entry/submit						controllers.Instrument.submit
-GET  	/entry/:id/delete					controllers.Instrument.delete(id: Int)
-GET		/entry/:id/edit					controllers.Instrument.edit(id: Int)
-POST 	/entries/update						controllers.Instrument.update
+GET       /                           controllers.Instrument.index
+GET       /entries/:page              controllers.Instrument.listEntries(page:Int)
+GET       /entry/create               controllers.Instrument.create
+POST      /entry/submit               controllers.Instrument.submit
+GET       /entry/:id/delete           controllers.Instrument.delete(id: Int)
+GET       /entry/:id/edit             controllers.Instrument.edit(id: Int)
+POST      /entry/update               controllers.Instrument.update
 
 ### Users
-GET 	/user/create						controllers.Authentication.create
-POST	/user/submit						controllers.Authentication.submit
-GET 	/user/login							controllers.Authentication.login
-GET		/user/logout						controllers.Authentication.logout
-POST	/user/authenticate					controllers.Authentication.authenticate
-GET		/user/edit							controllers.Authentication.edit
-POST	/user/update						controllers.Authentication.update
+GET       /user/create                controllers.Authentication.create
+POST      /user/submit                controllers.Authentication.submit
+GET       /user/login                 controllers.Authentication.login
+GET       /user/logout                controllers.Authentication.logout
+POST      /user/authenticate          controllers.Authentication.authenticate
+GET       /user/edit                  controllers.Authentication.edit
+POST      /user/update                controllers.Authentication.update

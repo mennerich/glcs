@@ -10,7 +10,7 @@
           @validSession match {
             case true => { 
               <li><a href="@routes.Authentication.logout">Logout</a></li>
-              <li><a href="#">Profile</a></li>
+              <li><a href="@routes.Authentication.edit">Profile</a></li>
             }
             case false => { <li><a href="@routes.Authentication.login">Login</a></li> }
           }

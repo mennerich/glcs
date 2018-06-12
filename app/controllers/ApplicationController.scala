@@ -4,7 +4,7 @@ import helpers.{ StatsSupport, Averages, SlackSupport }
 import java.sql.Date
 import java.util.Calendar
 import javax.inject.Inject
-import models.{ EntryRepo, Entry, SessionKeyRepo }
+import models.{ EntryRepo, Entry, SessionKeyRepo, UserRepo }
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
@@ -21,6 +21,7 @@ class Instrument @Inject()
   (implicit ec: ExecutionContext, 
   entryRepo: EntryRepo, 
   sessionKeyRepo: SessionKeyRepo,
+  userRepo: UserRepo,
   ws: WSClient,
   config: Configuration,
   lifecycle: ApplicationLifecycle,
@@ -61,7 +62,7 @@ class Instrument @Inject()
         case false => Future(Ok(views.html.index(entries, averages, page, false)))
       }
     }.getOrElse {
-      entryRepo.listEntries(10, page).map(
+      entryRepo.listEntries(page * 10, 10).map(
         entries => {
           Ok(views.html.index(entries, averages, page, false))
         }
@@ -99,7 +100,7 @@ class Instrument @Inject()
               entry.readingTime, 
               entry.readingDate,
               entry.exercise,
-              sessionKeyRepo.findIdBySessionKey(sessionKey).getOrElse(throw new Exception),
+              userRepo.findBySessionKey(sessionKey).getOrElse(throw new Exception),
               entry.weight
             )
           ).map(_ => {
