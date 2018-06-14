@@ -161,6 +161,7 @@ class Instrument @Inject()
         Future(Redirect(routes.Instrument.listEntries(0)).flashing("error" -> "invalid form"))
       },
       entry => {
+        println(entry)
         entryRepo.update(entry).map(_ => {
           Redirect(routes.Instrument.listEntries(0)).flashing("success" -> s"${entry.id} updated")
         })

@@ -44,7 +44,7 @@ class EntryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 
   def delete(id: Int): Future[Int] = db.run(Entries.filter(_.id === id).delete)
   
-  def update(entry: Entry): Future[Int] = db.run(Entries.update(entry)) 
+  def update(entry: Entry): Future[Int] = db.run(Entries.filter(_.id === entry.id).update(entry)) 
 
   private[models] class EntriesTable(tag: Tag) extends Table[Entry](tag, "ENTRY") {
     def id = column[Int]("ID", O.AutoInc, O.PrimaryKey)
